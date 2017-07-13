@@ -1,0 +1,27 @@
+{
+  "name": "splice",
+  "version": "0.0.1",
+  "description": "GUI workflow for Front-End developers based on Electron",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/SuperAL/splice.git",
+  "keywords": [
+    "Electron",
+    "workflow"
+  ],
+  "author": "GitHub",
+  "license": "CC0-1.0",
+  "dependencies": {
+    "gulp": "~3.9.0",
+    "gulp-postcss": "~6.0.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-cssnano": "^2.1.2",
+    "autoprefixer": "~6.1.2"
+  },
+  "devDependencies": {
+    "electron": "~1.6.2",
+    "electron-reload": "^1.2.1"
+  }
+}

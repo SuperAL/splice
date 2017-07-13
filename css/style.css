@@ -1,0 +1,37 @@
+		.dragarea{
+			border: 8px #ddd dashed;
+			border-radius: 6px;
+			width: 250px;
+			height: 250px;
+			position: absolute;
+			left: 50%;
+			top: 80px;
+			margin-left: -125px;
+			line-height: 250px;
+			font-size: 16px;
+			color: #ccc;
+			font-weight: bold;
+			font-family: helvitica Nueue, Microsoft yahei;
+			text-align: center;
+		}
+		.dragarea-on{
+			color: #999;
+			border: 8px #aaa dashed;
+		}
+		h1.title{
+			text-align: center;
+			font-family: helvitica Nueue, Microsoft yahei;
+			color: #000;
+			font-weight: normal;
+			font-size: 18px;
+			line-height: 40px;
+			padding: 0;
+			margin: 0;
+		}
+		p.desc{
+			font-size: 12px;
+			text-align: center;
+			color: #999;
+			padding: 0;
+			margin: 0;
+		}
