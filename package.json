@@ -4,7 +4,9 @@
   "description": "GUI workflow for Front-End developers based on Electron",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "watch": "watchify js/es6.js -t babelify -o js/index.js --debug --verbose",
+    "package": "electron-packager ./ DemoApps --overwrite --app-version=1.0.0 --platform=win32 --arch=all --out=../DemoApps --version=1.2.1 --icon=./public/img/app-icon.icns"
   },
   "repository": "https://github.com/SuperAL/splice.git",
   "keywords": [
@@ -21,7 +23,11 @@
     "autoprefixer": "~6.1.2"
   },
   "devDependencies": {
-    "electron": "~1.6.2",
-    "electron-reload": "^1.2.1"
+    "babel-preset-es2015": "^6.24.1",
+    "babelify": "^7.3.0",
+    "browserify": "^14.4.0",
+    "electron": "^1.6.11",
+    "electron-reload": "^1.2.1",
+    "watchify": "^3.9.0"
   }
 }
