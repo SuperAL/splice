@@ -1,3 +1,4 @@
 body {
 	display: flex;
+	transform: rotate(45deg);
 }

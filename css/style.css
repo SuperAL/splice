@@ -35,3 +35,38 @@
 			padding: 0;
 			margin: 0;
 		}
+
+
+
+/* photon.css custom */
+
+		.nav-group-item:hover {
+			background-color: #e8e6e8;
+		}
+
+		/* 拖拽元素上的删除按钮 */
+		.draggable-item {
+			position: relative;
+		}
+		.draggable-item .icon-delete-action {
+			position: absolute;
+			top: 15px;
+			right: 5px;
+			width: 15px;
+			height: 15px;
+			font-size: 15px;
+			line-height: 15px;
+			text-align: center;
+			color: #666;
+			opacity: 0;
+			transition: opacity .1s linear,background-color .1s linear;
+			border-radius: 3px;
+			transform: translateY(-50%);
+			z-index: 10;
+		}
+		.draggable-item:hover .icon-delete-action {
+			opacity: 1;
+		}
+		.draggable-item .icon-delete-action:hover {
+			background-color: rgba(0,0,0,.08);
+		}
