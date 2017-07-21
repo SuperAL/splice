@@ -39,7 +39,7 @@
         <div class="pane pane-sm">
           <nav class="nav-group" id="draggable">
             <template v-for="(action, index) in currentActions">
-              <span class="nav-group-item draggable-item">
+              <span class="nav-group-item draggable-item" :data-idx="index">
                 <span :class="'icon icon-'+action.action.icon"></span> {{ action.action.name }}
                 <span class="icon icon-cancel icon-delete-action" @click="deleteAction(action, index)"></span>
               </span>
@@ -63,7 +63,11 @@
   </div>
   <script type="text/javascript" src="./js/jquery-1.8.2.js"></script>
   <script type="text/javascript" src="./js/vue.js"></script>
-  <script type="text/javascript" src="./node_modules/dragula/dist/dragula.min.js"></script>
+  <script type="text/javascript" src="./node_modules/dragula/dist/dragula.min.js"></script>  
+  
+  <!-- 引入自动化处理相关函数 -->
+  <script type="text/javascript" src="./js/workflow.js"></script>
+
   <script type="text/javascript" src="./js/index.js"></script>
 </body>
 <script>

@@ -24,6 +24,9 @@ function createWindow () {
     slashes: true
   }))
 
+  // 隐藏菜单栏
+  mainWindow.setMenu(null);
+
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
 

@@ -1,11 +1,12 @@
-var fs = require('fs');
-var Path = require("path");
-var gulp = require('gulp');
-var postcss = require('gulp-postcss');
-var minifyCSS = require('gulp-cssnano');
-var rename = require('gulp-rename');
-var autoprefixer = require('autoprefixer');
-console.log('reloadss');
+const typeFUNCS = {
+  'CSS': handleCSS,
+  'JS': handleJS,
+  '通用': handleALL
+}
+
+
+
+
 
 // 可配置信息
 var config = {
@@ -34,6 +35,15 @@ var app = new Vue({
       // { name: 'prefix', icon: 'home' }, { name: 'compress', icon: 'light-up' }
     ]
   },
+  computed: {
+    currentActionsName() {
+      let arr = [];
+      this.currentActions.forEach(function(element) {
+        arr.push(element.action.name);
+      })
+      return arr;
+    }
+  },
   methods: {
     addToCurrent(category, action, index) {
       // 判断当前操作类型是否可选
@@ -45,7 +55,8 @@ var app = new Vue({
       }
 
       // 更新当前操作类型
-      this.currentCategory = category.name == '通用' ? this.currentCategory : category.name;
+      this.currentCategory = ((category.name == '通用') && (!!this.currentCategory)) ? this.currentCategory : category.name;
+
       // 添加操作
       let selected = {
         action: action,
@@ -54,6 +65,8 @@ var app = new Vue({
       this.currentActions.push(selected);
       // 禁用已选操作
       this.actions[index[0]].list[index[1]].disabled = true;
+
+      console.log(`this.currentCategory: ${this.currentCategory}`);
     },
     deleteAction(action, index) {
       // 删除操作
@@ -64,13 +77,13 @@ var app = new Vue({
       this.actions[idx[0]].list[idx[1]].disabled = false;
 
       let isLeftCommon = false;
-      for(let item of this.currentActions) {
+      for (let item of this.currentActions) {
         let category = this.actions[item.index[0]].name;
         if (category == '通用') {
-            isLeftCommon = true;
+          isLeftCommon = true;
         }
       }
-      
+
       // 判断当前操作列表是否为空
       if (!(this.currentActions.length > 0) || isLeftCommon) {
         this.currentCategory = '';
@@ -98,12 +111,33 @@ var app = new Vue({
 
 
 
+let drake;
 
+// 处理拖拽排序功能，更新数据
+// 经历了两次数据更新，页面渲染
+function dropHandler(el, target, source, sibling) {
+  console.log(el, target, source, sibling);
+  // 删除拖拽的数据 index
+  let idx = el.dataset.idx;
+  let action = app.currentActions.splice(idx, 1)[0];
 
+  // 获取新的位置
+  let newidx = sibling ? (sibling.dataset.idx - 1) : (target.querySelectorAll('.draggable-item').length);
+
+  // 插入到新的位置
+  app.$nextTick(function() {
+    app.currentActions.splice(newidx, 0, action);
+  })
+  console.info(app.currentActions);
+}
 
 $(document).ready(function() {
   // 初始化拖拽排序
-  var drake = dragula([document.querySelector('#draggable')]);
+  drake = dragula([document.querySelector('#draggable')]);
+  // 处理拖拽排序功能
+  drake.on('drop', dropHandler);
+
+
   // 删除单个自动化操作
   // $('.icon-delete-action').on('click', deleteAction)
 
@@ -156,8 +190,8 @@ $(document).ready(function() {
           fileNameArr = results.split('/'),
           fileName = fileNameArr[fileNameArr.length - 1];
 
-        //过滤非css文件
-        if (fileType == 'css') {
+        // 判断文件格式
+        if (handleFileType(fileType)) {
           var CSSpath = Path.dirname(results),
             CSSname = fileName.split('.css')[0] + '-result.css',
             fileroute = '';
@@ -188,16 +222,52 @@ $(document).ready(function() {
           // });
 
           //有文件，直接覆盖；没有文件，新建文件
-          writeCSS(results, CSSpath, CSSname, function() {
+          handleCSS(app.currentActionsName, results, CSSpath, CSSname, function() {
             console.log(results);
           });
-        } else {
-          alert('请拖进css文件～');
         }
+
       });
     }
   });
 });
+
+/**
+ * 判断文件类型
+ * @author Alexee
+ * @date   2017-07-21
+ * @param  {string}   fileType [文件后缀]
+ * @return {boolean}           [是否符合格式]
+ */
+var handleFileType = (fileType) => {
+  let availableType = ['css', 'js'];
+  // 判断当前文件处理类型
+  let currentType = app.currentCategory;
+  if (currentType !== '通用') {
+    let type = currentType.toLowerCase();
+    console.log(`type: ${type}`);
+    if (fileType !== type) {
+      alert(`请拖进 ${type} 文件～`);
+    } else {
+      return true;
+    }
+  } else {
+    let isAvailable = false;
+    availableType.forEach(function(element, index, array) {
+      if (isAvailable) { return; }
+      if (fileType == element) {
+        isAvailable = true;
+      }
+    })
+    if (!isAvailable) {
+      alert(`请拖进 ${availableType.join('/') } 类型的文件～`);
+    } else {
+      return true;
+    }
+  }
+}
+
+
 
 // 访问到目录总深路径
 var walk = function(dir, done) {
@@ -215,19 +285,8 @@ var walk = function(dir, done) {
   });
 };
 
-var writeCSS = function(url, csspath, cssname, callback) {
-  return gulp.src(url)
-    .pipe(postcss([autoprefixer({ browsers: ['last 4 versions'] })]))
-    // .pipe(minifyCSS({
-    //     safe: true,
-    //     reduceTransforms: false,
-    //     advanced: false,
-    //     compatibility: 'ie7',
-    //     keepSpecialComments: 0
-    // }))
-    .pipe(rename(cssname))
-    .pipe(gulp.dest(csspath));
-}
+
+
 
 // 创建css文件
 var createCSS = function(path, filename, callback) {
