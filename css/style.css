@@ -44,7 +44,9 @@
 			background-color: #e8e6e8;
 		}
 
-		/* 拖拽元素上的删除按钮 */
+		/**
+		 * 拖拽元素上的删除按钮
+		 */
 		.draggable-item {
 			position: relative;
 		}
@@ -70,3 +72,14 @@
 		.draggable-item .icon-delete-action:hover {
 			background-color: rgba(0,0,0,.08);
 		}
+
+		/**
+		 * 操作禁选状态
+		 */
+		 .nav-group.disabled .nav-group-item,
+		 .nav-group-item.disabled, 
+		 .nav-group-item.disabled:hover, 
+		 .nav-group-item.disabled:active {
+		 	color: #b8b6b8;
+		 	background-color: transparent;
+		 }
