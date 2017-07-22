@@ -2,6 +2,7 @@ const categoryFUNCS = {
   'HTML': handleHTML,
   'CSS': handleCSS,
   'JS': handleJS,
+  'IMAGE': handleIMG,
   '通用': handleALL
 }
 
@@ -30,6 +31,7 @@ var app = new Vue({
       { name: 'HTML', list: [{ name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false }] },
       { name: 'CSS', list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'home', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'light-up', disabled: false }] },
       { name: 'JS', list: [{ name: '压缩', funcName: 'uglify', icon: 'light-up', disabled: false }] },
+      { name: 'IMAGE', list: [{ name: '压缩', funcName: 'imagemin', icon: 'light-up', disabled: false }] },
       { name: '通用', list: [{ name: '重命名', funcName: 'rename', icon: 'home', disabled: false }] }
     ],
     currentCategory: '',
@@ -85,9 +87,13 @@ var app = new Vue({
       }
 
       // 判断当前操作列表是否为空
-      if (!(this.currentActions.length > 0) || isLeftCommon) {
+      if (!(this.currentActions.length > 0)) {
         this.currentCategory = '';
       }
+      if (isLeftCommon) {
+        this.currentCategory = '通用';
+      }
+      console.log(`this.currentCategory: ${this.currentCategory}`);
     }
   }
 })
@@ -172,6 +178,13 @@ $(document).ready(function() {
   // drop只支持原生绑定
   $('.j-dragarea')[0].addEventListener('drop', function(e) {
     e.preventDefault();
+
+    // 当前未选择任何操作
+    if (app.currentCategory == '') {
+      alert(`当前未选择任何操作`);
+      return;
+    }
+
     var fileList = e.dataTransfer.files; //获取文件
     var len = fileList.length;
 
@@ -227,30 +240,30 @@ $(document).ready(function() {
  * @return {boolean}           [是否符合格式]
  */
 var handleFileType = (fileType) => {
-  let availableType = ['css', 'js'];
+  let typeOptions = {
+    'CSS': ['css'],
+    'JS': ['js'],
+    'HTML': ['html'],
+    'IMAGE': ['png', 'jpg','jpeg', 'gif', 'svg']
+  }
+  let availableType = ['css', 'js', 'html', 'png'];
+
   // 判断当前文件处理类型
-  let currentType = app.currentCategory;
-  if (currentType !== '通用') {
-    let type = currentType.toLowerCase();
-    console.log(`type: ${type}`);
-    if (fileType !== type) {
-      alert(`请拖进 ${type} 文件～`);
+  let currentCategory = app.currentCategory;
+
+  if (currentCategory !== '通用') {
+    // 获取当前可处理的文件的类型
+    let currentTypes = typeOptions[currentCategory];
+
+    console.log(`type: ${currentTypes.join('/')}`);
+
+    if (currentTypes.indexOf(fileType) == -1) {
+      alert(`请拖进 ${currentTypes.join('/')} 文件～`);
     } else {
       return true;
-    }
+    } 
   } else {
-    let isAvailable = false;
-    availableType.forEach(function(element, index, array) {
-      if (isAvailable) { return; }
-      if (fileType == element) {
-        isAvailable = true;
-      }
-    })
-    if (!isAvailable) {
-      alert(`请拖进 ${availableType.join('/') } 类型的文件～`);
-    } else {
-      return true;
-    }
+    return true;
   }
 }
 

@@ -7,6 +7,10 @@ var rename = require('gulp-rename');
 var autoprefixer = require('autoprefixer');
 var uglify = require("gulp-uglify");
 var htmlmin = require('gulp-htmlmin');
+var spritesmith = require('gulp.spritesmith');
+// 图片压缩
+var imagemin = require('gulp-imagemin');
+var pngquant = require('imagemin-pngquant');
 
 /**
  * -----------------------------------------------------------------
@@ -20,8 +24,8 @@ var htmlmin = require('gulp-htmlmin');
  * @param  {gulp stream}   stream
  * @return {gulp stream}   stream
  */
- var minifyHTML = (stream) => {
-  return stream.pipe(htmlmin({collapseWhitespace:true}))
+var minifyHTML = (stream) => {
+  return stream.pipe(htmlmin({ collapseWhitespace: true }))
 }
 
 
@@ -72,10 +76,53 @@ var compressCSS = (stream) => {
  */
 var uglifyJS = (stream) => {
   return stream.pipe(uglify({
-    mangle: true,//类型：Boolean 默认：true 是否修改变量名
+    mangle: true, //类型：Boolean 默认：true 是否修改变量名
     compress: true //类型：Boolean 默认：true 是否完全压缩
   }))
 }
+
+
+
+
+/**
+ * -----------------------------------------------------------------
+ * IMAGE 文件相关操作
+ * -----------------------------------------------------------------
+ */
+/**
+ * gulp-imagemin - 压缩图片(PNG, JPEG, GIF and SVG)
+ * @author Alexee
+ * @date   2017-07-22
+ * @param  {gulp stream}   stream
+ * @return {gulp stream}   stream
+ */
+var imageminIMG = (stream) => {
+  return stream.pipe(imagemin([
+    imagemin.gifsicle({ interlaced: true }),
+    imagemin.jpegtran({ progressive: true }),
+    // imagemin.optipng({ optimizationLevel: 5 }),
+    imagemin.svgo({ plugins: [{ removeViewBox: true }] }),
+    pngquant()
+  ]))
+}
+
+/**
+ * gulp.spritesmith - 生成精灵图和对应的 css 文件
+ * @author Alexee
+ * @date   2017-07-22
+ * @param  {gulp stream}   stream
+ * @return {gulp stream}   stream
+ */
+var spriteIMG = (stream) => {
+  var spriteData = gulp.src('images/*.png').pipe(spritesmith({
+    imgName: 'sprite.png',
+    cssName: 'sprite.css',
+    imgPath: '../images/sprite.png',
+    padding: 4
+  }));
+  return spriteData.pipe(gulp.dest('images'));
+}
+
 
 
 
@@ -108,6 +155,8 @@ const FUNCS = {
   'compress': compressCSS,
   // js
   'uglify': uglifyJS,
+  // image
+  'imagemin': imageminIMG,
   // common
   'rename': renameALL
 }
@@ -123,7 +172,7 @@ const FUNCS = {
  * @param  {Function} callback    [文件处理完的回调函数]
  * @return {[type]}               [description]
  */
- var handleHTML = (actionsName, src, dist, newName, callback) => {
+var handleHTML = (actionsName, src, dist, newName, callback) => {
   console.log(actionsName, src, dist, newName, callback);
   let stream = gulp.src(src);
   actionsName.forEach(function(element) {
@@ -176,16 +225,43 @@ var handleJS = (actionsName, src, dist, newName, callback) => {
   return stream.pipe(gulp.dest(dist));
 }
 
-var handleALL = (url, csspath, cssname, callback) => {
-  // return gulp.src(url)
-  // .pipe(postcss([autoprefixer({ browsers: ['last 4 versions'] })]))
-  // .pipe(minifyCSS({
-  //  safe: true,
-  //  reduceTransforms: false,
-  //  advanced: false,
-  //  compatibility: 'ie7',
-  //  keepSpecialComments: 0
-  // }))
-  // .pipe(rename(cssname))
-  // .pipe(gulp.dest(csspath));
+/**
+ * 处理 image 文件
+ * @author Alexee
+ * @date   2017-07-22
+ * @param  {array}   actionsName  [需要执行的操作]
+ * @param  {string}   src         [处理的文件地址]
+ * @param  {string}   dist        [文件导出地址]
+ * @param  {string}   newName     [文件重命名]
+ * @param  {Function} callback    [文件处理完的回调函数]
+ * @return {[type]}               [description]
+ */
+var handleIMG = (actionsName, src, dist, newName, callback) => {
+  let stream = gulp.src(src);
+  actionsName.forEach(function(element) {
+    console.log(`执行操作：${element}`);
+    stream = FUNCS[element](stream, { newName });
+  })
+  return stream.pipe(gulp.dest(dist));
+}
+
+
+/**
+ * 处理 所有 文件
+ * @author Alexee
+ * @date   2017-07-22
+ * @param  {array}   actionsName  [需要执行的操作]
+ * @param  {string}   src         [处理的文件地址]
+ * @param  {string}   dist        [文件导出地址]
+ * @param  {string}   newName     [文件重命名]
+ * @param  {Function} callback    [文件处理完的回调函数]
+ * @return {[type]}               [description]
+ */
+ var handleALL = (actionsName, src, dist, newName, callback) => {
+  let stream = gulp.src(src);
+  actionsName.forEach(function(element) {
+    console.log(`执行操作：${element}`);
+    stream = FUNCS[element](stream, { newName });
+  })
+  return stream.pipe(gulp.dest(dist));
 }
