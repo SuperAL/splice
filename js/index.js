@@ -1,4 +1,5 @@
-const typeFUNCS = {
+const categoryFUNCS = {
+  'HTML': handleHTML,
   'CSS': handleCSS,
   'JS': handleJS,
   '通用': handleALL
@@ -26,20 +27,19 @@ var app = new Vue({
   el: '#app',
   data: {
     actions: [
-      { name: 'CSS', list: [{ name: 'prefix', icon: 'home', disabled: false }, { name: 'compress', icon: 'light-up', disabled: false }] },
-      { name: 'JS', list: [{ name: 'prefix', icon: 'home', disabled: false }, { name: 'compress', icon: 'light-up', disabled: false }] },
-      { name: '通用', list: [{ name: 'rename', icon: 'home', disabled: false }] }
+      { name: 'HTML', list: [{ name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false }] },
+      { name: 'CSS', list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'home', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'light-up', disabled: false }] },
+      { name: 'JS', list: [{ name: '压缩', funcName: 'uglify', icon: 'light-up', disabled: false }] },
+      { name: '通用', list: [{ name: '重命名', funcName: 'rename', icon: 'home', disabled: false }] }
     ],
     currentCategory: '',
-    currentActions: [
-      // { name: 'prefix', icon: 'home' }, { name: 'compress', icon: 'light-up' }
-    ]
+    currentActions: []
   },
   computed: {
     currentActionsName() {
       let arr = [];
       this.currentActions.forEach(function(element) {
-        arr.push(element.action.name);
+        arr.push(element.action.funcName);
       })
       return arr;
     }
@@ -186,43 +186,30 @@ $(document).ready(function() {
       walk(filepath, function(err, results) {
         console.log('filepath results', results);
         var fileTypeArr = results.split('.'),
+          // 文件类型 fileType:css
           fileType = fileTypeArr[fileTypeArr.length - 1],
-          fileNameArr = results.split('/'),
+          fileNameArr = results.split("\\"),
+          // 文件名 fileName: test.css
           fileName = fileNameArr[fileNameArr.length - 1];
+          console.log(fileTypeArr, fileType, fileNameArr, fileName);
 
         // 判断文件格式
         if (handleFileType(fileType)) {
-          var CSSpath = Path.dirname(results),
-            CSSname = fileName.split('.css')[0] + '-result.css',
+          var fileDir = Path.dirname(results),
+            newName = 'test-result.'+fileType,
             fileroute = '';
 
           // 当前目录下新建文件夹
           if (config.cssDir !== '') {
-            CSSpath = CSSpath + '/' + config.cssDir;
+            fileDir = fileDir + '\\' + config.cssDir;
           }
 
-          fileroute = CSSpath + '/' + CSSname;
+          fileroute = fileDir + '\\';
           console.log('保存到目录:' + fileroute);
 
-          // 判断文件是否存在
-          // fs.access(fileroute, function(err) {
-          //     if (!err) {
-          //         //创建CSS文件
-          //         createCSS(CSSpath, CSSname, function() {
-          //             writeCSS(results, CSSpath, CSSname, function() {
-          //                 console.log(results);
-          //             });
-          //         });
-          //     } else {
-          //         //如有文件，直接覆盖
-          //         writeCSS(results, CSSpath, CSSname, function() {
-          //             console.log(results);
-          //         });
-          //     }
-          // });
-
+          var handleFUNC = categoryFUNCS[app.currentCategory];
           //有文件，直接覆盖；没有文件，新建文件
-          handleCSS(app.currentActionsName, results, CSSpath, CSSname, function() {
+          handleFUNC(app.currentActionsName, results, fileDir, newName, function() {
             console.log(results);
           });
         }
