@@ -31,7 +31,7 @@ var app = new Vue({
       { name: 'HTML', list: [{ name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false }] },
       { name: 'CSS', list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'home', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'light-up', disabled: false }] },
       { name: 'JS', list: [{ name: '压缩', funcName: 'uglify', icon: 'light-up', disabled: false }] },
-      { name: 'IMAGE', list: [{ name: '压缩', funcName: 'imagemin', icon: 'light-up', disabled: false }] },
+      { name: 'IMAGE', list: [{ name: '压缩', funcName: 'imagemin', icon: 'light-up', disabled: false },{ name: '精灵图', funcName: 'sprite', icon: 'home', disabled: false }] },
       { name: '通用', list: [{ name: '重命名', funcName: 'rename', icon: 'home', disabled: false }] }
     ],
     currentCategory: '',
@@ -192,9 +192,25 @@ $(document).ready(function() {
       return false;
     }
 
+    // 是否批量操作文件
+    let isTotal = app.currentActionsName.indexOf('sprite') !== -1;
+    console.log('isTotal',isTotal);
+    let multiSrc = [];
+
+    var handleFUNC = categoryFUNCS[app.currentCategory];
+
+    
     //遍历拖进来的文件
     for (var i = 0; i < len; i++) {
       var filepath = fileList[i].path;
+      console.log('遍历拖进来的文件'+filepath);
+
+      // 批量操作文件
+      if (isTotal) {
+        multiSrc.push(filepath);
+        continue;
+      }
+
 
       walk(filepath, function(err, results) {
         console.log('filepath results', results);
@@ -220,13 +236,24 @@ $(document).ready(function() {
           fileroute = fileDir + '\\';
           console.log('保存到目录:' + fileroute);
 
-          var handleFUNC = categoryFUNCS[app.currentCategory];
+          
+
+
           //有文件，直接覆盖；没有文件，新建文件
           handleFUNC(app.currentActionsName, results, fileDir, newName, function() {
             console.log(results);
           });
         }
 
+      });
+    }
+
+    if (isTotal) {
+      console.log('multiSrc'+multiSrc);
+      //有文件，直接覆盖；没有文件，新建文件
+      let newName = '';
+      handleFUNC(app.currentActionsName, multiSrc, 'F:\\Projects - relative\\slice-workflow - relative\\test-files', newName, function() {
+        console.log(results);
       });
     }
   });

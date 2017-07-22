@@ -7,10 +7,15 @@ var rename = require('gulp-rename');
 var autoprefixer = require('autoprefixer');
 var uglify = require("gulp-uglify");
 var htmlmin = require('gulp-htmlmin');
-var spritesmith = require('gulp.spritesmith');
+
 // 图片压缩
 var imagemin = require('gulp-imagemin');
 var pngquant = require('imagemin-pngquant');
+
+// 精灵图处理
+var spritesmith = require('gulp.spritesmith');
+var buffer = require('vinyl-buffer');
+var merge = require('merge-stream');
 
 /**
  * -----------------------------------------------------------------
@@ -114,13 +119,39 @@ var imageminIMG = (stream) => {
  * @return {gulp stream}   stream
  */
 var spriteIMG = (stream) => {
-  var spriteData = gulp.src('images/*.png').pipe(spritesmith({
+  // Generate our spritesheet
+  var spriteData = stream.pipe(spritesmith({
     imgName: 'sprite.png',
-    cssName: 'sprite.css',
-    imgPath: '../images/sprite.png',
-    padding: 4
+    cssName: 'sprite.css'
   }));
-  return spriteData.pipe(gulp.dest('images'));
+
+  // Pipe image stream through image optimizer and onto disk
+  var imgStream = spriteData.img
+    // DEV: We must buffer our stream into a Buffer for `imagemin`
+    .pipe(buffer())
+    .pipe(imagemin())
+    // .pipe(gulp.dest('path/to/image/folder/'));
+
+  // Pipe CSS stream through CSS optimizer and onto disk
+  var cssStream = spriteData.css
+  .pipe(minifyCSS({
+    safe: true,
+    reduceTransforms: false,
+    advanced: false,
+    compatibility: 'ie7',
+    keepSpecialComments: 0
+  }))
+  // .pipe(gulp.dest('path/to/css/folder/'));
+
+  // Return a merged stream to handle both `end` events
+  return merge(imgStream, cssStream);
+
+  // return stream.pipe(spritesmith({
+  //   imgName: 'sprite.png',
+  //   cssName: 'sprite.css',
+  //   imgPath: '../images/sprite.png',
+  //   padding: 4
+  // }));
 }
 
 
@@ -157,6 +188,7 @@ const FUNCS = {
   'uglify': uglifyJS,
   // image
   'imagemin': imageminIMG,
+  'sprite': spriteIMG,
   // common
   'rename': renameALL
 }
