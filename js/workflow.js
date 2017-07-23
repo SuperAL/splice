@@ -95,7 +95,7 @@ var uglifyJS = (stream) => {
  * -----------------------------------------------------------------
  */
 /**
- * gulp-imagemin - 压缩图片(PNG, JPEG, GIF and SVG)
+ * gulp-imagemin - 压缩图片(PNG, JPEG, JPG, GIF and SVG)
  * @author Alexee
  * @date   2017-07-22
  * @param  {gulp stream}   stream

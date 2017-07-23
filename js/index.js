@@ -192,10 +192,13 @@ $(document).ready(function() {
       return false;
     }
 
-    // 是否批量操作文件
+    // 判断是否批量操作文件
     let isTotal = app.currentActionsName.indexOf('sprite') !== -1;
     console.log('isTotal',isTotal);
     let multiSrc = [];
+    let multiFileDir = Path.dirname(fileList[0].path);
+
+
 
     var handleFUNC = categoryFUNCS[app.currentCategory];
 
@@ -205,13 +208,21 @@ $(document).ready(function() {
       var filepath = fileList[i].path;
       console.log('遍历拖进来的文件'+filepath);
 
-      // 批量操作文件
+      // 获取需要批量操作的文件位置
       if (isTotal) {
-        multiSrc.push(filepath);
+        // 判断是文件还是文件夹
+        // src/**/*.{jpeg,jpg,png,gif,svg}
+        let stats = fs.statSync(filepath);
+        if (stats && stats.isDirectory()) {
+          multiSrc.push(Path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'));
+          console.log(stats,filepath,Path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'),multiSrc)
+        } else {
+          multiSrc.push(filepath);
+        }
         continue;
       }
 
-
+      // 分别处理单个文件
       walk(filepath, function(err, results) {
         console.log('filepath results', results);
         var fileTypeArr = results.split('.'),
@@ -224,7 +235,7 @@ $(document).ready(function() {
 
         // 判断文件格式
         if (handleFileType(fileType)) {
-          var fileDir = Path.dirname(results),
+          let fileDir = Path.dirname(results),
             newName = 'test-result.'+fileType,
             fileroute = '';
 
@@ -244,15 +255,15 @@ $(document).ready(function() {
             console.log(results);
           });
         }
-
       });
     }
 
+    // 批量处理文件
     if (isTotal) {
       console.log('multiSrc'+multiSrc);
       //有文件，直接覆盖；没有文件，新建文件
       let newName = '';
-      handleFUNC(app.currentActionsName, multiSrc, 'F:\\Projects - relative\\slice-workflow - relative\\test-files', newName, function() {
+      handleFUNC(app.currentActionsName, multiSrc, multiFileDir, newName, function() {
         console.log(results);
       });
     }
