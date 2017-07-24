@@ -122,7 +122,9 @@ var spriteIMG = (stream) => {
   // Generate our spritesheet
   var spriteData = stream.pipe(spritesmith({
     imgName: 'sprite.png',
-    cssName: 'sprite.css'
+    cssName: 'sprite.css',
+    imgPath: '../images/sprite.png',
+    padding: 4
   }));
 
   // Pipe image stream through image optimizer and onto disk

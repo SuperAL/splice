@@ -26,9 +26,9 @@
         <div class="pane pane-sm sidebar">
           <template v-for="(category, cIndex) in actions">
             <nav class="nav-group" :class="{'disabled': (!!currentCategory && (category.name !== currentCategory) && (category.name !== '通用') && (currentCategory !== '通用'))}">
-              <h5 class="nav-group-title">{{ category.name }}</h5>
+              <h5 class="nav-group-title" v-cloak>{{ category.name }}</h5>
               <template v-for="(action, aIndex) in category.list">
-                <span class="nav-group-item" :class="{'disabled': action.disabled}" @click="addToCurrent(category, action, [cIndex, aIndex])">
+                <span class="nav-group-item" :class="{'disabled': action.disabled}" @click="addToCurrent(category, action, [cIndex, aIndex])" v-cloak>
                   <span :class="'icon icon-'+action.icon"></span> {{ action.name }}
                 </span>
               </template>
@@ -39,7 +39,7 @@
         <div class="pane pane-sm">
           <nav class="nav-group" id="draggable">
             <template v-for="(action, index) in currentActions">
-              <span class="nav-group-item draggable-item" :data-idx="index">
+              <span class="nav-group-item draggable-item" :data-idx="index" v-cloak>
                 <span :class="'icon icon-'+action.action.icon"></span> {{ action.action.name }}
                 <span class="icon icon-cancel icon-delete-action" @click="deleteAction(action, index)"></span>
               </span>
@@ -47,10 +47,10 @@
           </nav>
         </div>
         <div class="pane">
-          <h1 class="title">操作 {{ currentCategory }} 文件</h1>
+          <h1 class="title" v-cloak>操作 {{ currentCategory }} 文件</h1>
           <!-- todo:  拖拽排序-->
           <p>当前操作：
-            <span v-for="(action, index) in currentActions">{{ action.action.name + ((currentActions.length !== (index+1))?" > ":"")}}</span>
+            <span v-for="(action, index) in currentActions" v-cloak>{{ action.action.name + ((currentActions.length !== (index+1))?" > ":"")}}</span>
           </p>
           <p class="desc">＊用法：拖拽CSS文件到下面的线框中，会自动生成名字'-result'的结果css，支持多个文件。
           </p>

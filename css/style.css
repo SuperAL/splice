@@ -83,3 +83,7 @@
 		 	color: #b8b6b8;
 		 	background-color: transparent;
 		 }
+
+		 [v-cloak] { 
+		   display: none;
+		 }
