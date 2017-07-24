@@ -147,13 +147,6 @@ var spriteIMG = (stream) => {
 
   // Return a merged stream to handle both `end` events
   return merge(imgStream, cssStream);
-
-  // return stream.pipe(spritesmith({
-  //   imgName: 'sprite.png',
-  //   cssName: 'sprite.css',
-  //   imgPath: '../images/sprite.png',
-  //   padding: 4
-  // }));
 }
 
 

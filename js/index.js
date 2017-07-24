@@ -24,18 +24,64 @@ var config = {
 /**
  * Vue 实例
  */
+
+var customInput = {
+  data(){
+    return {
+
+    }
+  },
+  model: {
+    prop: 'value',
+    event: 'change'
+  },
+  props: ['label', 'value'],
+  template: `<div class="form-group">
+    <label>{{label}}</label>
+    <input type="text" class="form-control" placeholder="Email" :value="value"  @input="updateValue($event.target.value)">
+  </div>`,
+  methods: {
+    updateValue(newVal){
+      this.$emit('change',newVal)
+    }
+  }
+}
 var app = new Vue({
   el: '#app',
   data: {
     actions: [
-      { name: 'HTML', list: [{ name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false }] },
+      { name: 'HTML', 
+      list: [
+      { name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false }
+      ] },
       { name: 'CSS', list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'home', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'light-up', disabled: false }] },
       { name: 'JS', list: [{ name: '压缩', funcName: 'uglify', icon: 'light-up', disabled: false }] },
-      { name: 'IMAGE', list: [{ name: '压缩', funcName: 'imagemin', icon: 'light-up', disabled: false },{ name: '精灵图', funcName: 'sprite', icon: 'home', disabled: false }] },
+      { name: 'IMAGE', 
+      list: [
+      { name: '压缩', funcName: 'imagemin', icon: 'light-up', disabled: false },
+      { name: '精灵图', funcName: 'sprite', icon: 'home', disabled: false, isSolo: true, configs: [
+        {
+          type: 'custom-input',
+          label: 'imgPath',
+          value: './sprite.png'
+        },
+        {
+          type: 'custom-input',
+          label: 'imgDest',
+          value: './'
+        },
+        {
+          type: 'custom-input',
+          label: 'cssDest',
+          value: './'
+        }
+      ] }
+      ] },
       { name: '通用', list: [{ name: '重命名', funcName: 'rename', icon: 'home', disabled: false }] }
     ],
     currentCategory: '',
-    currentActions: []
+    currentActions: [],
+    isSolo: false // 当前只有一个操作，不能拼接其他操作
   },
   computed: {
     currentActionsName() {
@@ -46,8 +92,16 @@ var app = new Vue({
       return arr;
     }
   },
+  components: {
+    customInput
+  },
   methods: {
     addToCurrent(category, action, index) {
+      // 当前 可执行操作 为 不可拼接操作，因此不能添加新操作
+      if (this.isSolo) {return;}
+      // 操作列表不为空时不能添加 不可拼接操作
+      if ((this.currentActions.length > 0) && action.isSolo) {return;}
+
       // 判断当前操作类型是否可选
       let isCategoryDisabled = !!this.currentCategory && (category.name !== this.currentCategory) && (category.name !== '通用') && (this.currentCategory !== '通用');
       // 判断当前操作是否已经添加
@@ -68,13 +122,22 @@ var app = new Vue({
       // 禁用已选操作
       this.actions[index[0]].list[index[1]].disabled = true;
 
+      if (action.isSolo) {
+        // 禁用其他操作
+        this.isSolo = true;
+      }
+
       console.log(`this.currentCategory: ${this.currentCategory}`);
     },
-    deleteAction(action, index) {
+    deleteAction(actionWrap, index) {
       // 删除操作
       this.currentActions.splice(index, 1);
 
-      let idx = action.index;
+      if (actionWrap.action.isSolo) {
+        this.isSolo = false;
+      }
+
+      let idx = actionWrap.index;
       // 取消禁用删除的操作
       this.actions[idx[0]].list[idx[1]].disabled = false;
 
@@ -94,6 +157,9 @@ var app = new Vue({
         this.currentCategory = '通用';
       }
       console.log(`this.currentCategory: ${this.currentCategory}`);
+    },
+    getConfig(){
+      console.table(this.currentActions[0].action.configs)
     }
   }
 })

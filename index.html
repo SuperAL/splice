@@ -25,10 +25,10 @@
       <div class="pane-group">
         <div class="pane pane-sm sidebar">
           <template v-for="(category, cIndex) in actions">
-            <nav class="nav-group" :class="{'disabled': (!!currentCategory && (category.name !== currentCategory) && (category.name !== '通用') && (currentCategory !== '通用'))}">
+            <nav class="nav-group" :class="{'disabled': (!!currentCategory && (category.name !== currentCategory) && (category.name !== '通用') && (currentCategory !== '通用')) || isSolo}">
               <h5 class="nav-group-title" v-cloak>{{ category.name }}</h5>
               <template v-for="(action, aIndex) in category.list">
-                <span class="nav-group-item" :class="{'disabled': action.disabled}" @click="addToCurrent(category, action, [cIndex, aIndex])" v-cloak>
+                <span class="nav-group-item" :class="{'disabled': action.disabled || (action.isSolo && (currentActions.length > 0))}" @click="addToCurrent(category, action, [cIndex, aIndex])" v-cloak>
                   <span :class="'icon icon-'+action.icon"></span> {{ action.name }}
                 </span>
               </template>
@@ -37,14 +37,23 @@
         </div>
         <!-- 操作编辑栏 -->
         <div class="pane pane-sm">
-          <nav class="nav-group" id="draggable">
-            <template v-for="(action, index) in currentActions">
-              <span class="nav-group-item draggable-item" :data-idx="index" v-cloak>
-                <span :class="'icon icon-'+action.action.icon"></span> {{ action.action.name }}
-                <span class="icon icon-cancel icon-delete-action" @click="deleteAction(action, index)"></span>
-              </span>
-            </template>
-          </nav>
+          <ul class="al-list-group"  id="draggable">
+            <li class="al-list-group-header">
+               当前执行操作
+             </li>
+             <template v-for="(actionWrap, index) in currentActions">
+                <li class="al-list-group-item draggable-item" :data-idx="index" v-cloak>
+                  <span :class="'icon icon-'+actionWrap.action.icon"></span> {{ actionWrap.action.name }}
+                  <span class="icon icon-cancel icon-delete-action" @click="deleteAction(actionWrap, index)"></span>
+                  <form v-if="actionWrap.action.configs">
+                    <template v-for="config in actionWrap.action.configs">
+                      <component :is="config.type" :label="config.label" v-model="config.value"></component>
+                    </template>
+                  </form>
+                </li>
+              </template>
+          </ul>
+          <button class="btn btn-default" @click="getConfig">Default</button>
         </div>
         <div class="pane">
           <h1 class="title" v-cloak>操作 {{ currentCategory }} 文件</h1>

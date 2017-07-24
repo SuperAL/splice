@@ -87,3 +87,32 @@
 		 [v-cloak] { 
 		   display: none;
 		 }
+
+		/**
+		 * 自定义 list-group 样式
+		 */
+		 .al-list-group {
+		 	width: 100%;
+		 	list-style: none;
+		 	margin: 0;
+		 	padding: 0;
+		 }
+		 .al-list-group-item {
+		     padding: 10px;
+		     font-size: 12px;
+		     color: #414142;
+		     border-top: 1px solid #ddd
+		 }
+
+		 .al-list-group-item:first-child {
+		     border-top: 0
+		 }
+
+		 .al-list-group-item.active,.al-list-group-item.selected {
+		     color: #fff;
+		     background-color: #116cd6
+		 }
+
+		 .al-list-group-header {
+		     padding: 10px
+		 }
