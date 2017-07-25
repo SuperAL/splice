@@ -26,57 +26,143 @@ var config = {
  */
 
 var customInput = {
-  data(){
-    return {
-
-    }
-  },
   model: {
-    prop: 'value',
+    prop: 'userValue',
     event: 'change'
   },
-  props: ['label', 'value'],
+  props: ['label', 'userValue'],
   template: `<div class="form-group">
     <label>{{label}}</label>
-    <input type="text" class="form-control" placeholder="Email" :value="value"  @input="updateValue($event.target.value)">
+    <input type="text" class="form-control" placeholder="Email" :value="userValue"  @input="updateValue($event.target.value)">
   </div>`,
   methods: {
-    updateValue(newVal){
-      this.$emit('change',newVal)
+    updateValue(newVal) {
+      this.$emit('change', newVal)
     }
   }
 }
+var customRadio = {
+  model: {
+    prop: 'userValue',
+    event: 'change'
+  },
+  computed: {
+    randomName() {
+      return 'radio' + 100 * (Math.random() * Math.random()).toFixed(2);
+    }
+  },
+  props: ['label', 'userValue'],
+  template: `
+  <div class="form-group">
+    <div class="radio" v-for="item in label">
+      <label>
+        <input type="radio" name="randomName" @change="updateValue($event.target.value)" :value="item" :checked="userValue == item">
+        {{ item }}
+      </label>
+    </div>
+  </div>
+  `,
+  methods: {
+    updateValue(newVal) {
+      console.log(newVal);
+      this.$emit('change',newVal);
+    }
+  }
+}
+var customCheckbox = {
+  model: {
+    prop: 'userValue',
+    event: 'change'
+  },
+  props: ['label', 'userValue'],
+  template: `
+  <div class="checkbox">
+  <label>
+  <input type="checkbox" :checked="userValue" @change="updateValue($event.target.checked)"> {{ label }}
+  </label>
+  </div>
+  `,
+  methods: {
+    updateValue(newVal) {
+      console.log(newVal);
+      this.$emit('change',newVal);
+    }
+  }
+}
+
 var app = new Vue({
   el: '#app',
   data: {
-    actions: [
-      { name: 'HTML', 
-      list: [
-      { name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false }
-      ] },
+    actions: [{
+        name: 'HTML',
+        list: [
+          { name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false }
+        ]
+      },
       { name: 'CSS', list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'home', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'light-up', disabled: false }] },
       { name: 'JS', list: [{ name: '压缩', funcName: 'uglify', icon: 'light-up', disabled: false }] },
-      { name: 'IMAGE', 
-      list: [
-      { name: '压缩', funcName: 'imagemin', icon: 'light-up', disabled: false },
-      { name: '精灵图', funcName: 'sprite', icon: 'home', disabled: false, isSolo: true, configs: [
-        {
-          type: 'custom-input',
-          label: 'imgPath',
-          value: './sprite.png'
-        },
-        {
-          type: 'custom-input',
-          label: 'imgDest',
-          value: './'
-        },
-        {
-          type: 'custom-input',
-          label: 'cssDest',
-          value: './'
-        }
-      ] }
-      ] },
+      {
+        name: 'IMAGE',
+        list: [
+          { name: '压缩', funcName: 'imagemin', icon: 'light-up', disabled: false },
+          {
+            name: '精灵图',
+            funcName: 'sprite',
+            icon: 'home',
+            disabled: false,
+            isSolo: true,
+            configs: [{
+                type: 'custom-input',
+                label: '精灵图文件名',
+                key: 'imgName',
+                value: 'sprite.png'
+              },
+              {
+                type: 'custom-input',
+                label: 'css文件名',
+                key: 'cssName',
+                value: 'sprite.css'
+              },
+              {
+                type: 'custom-input',
+                label: 'css中引用的图片地址',
+                key: 'imgPath',
+                value: 'sprite.png'
+              },
+              {
+                type: 'custom-input',
+                label: '精灵图导出地址',
+                key: 'imgDest',
+                value: './'
+              },
+              {
+                type: 'custom-input',
+                label: 'css导出地址',
+                key: 'cssDest',
+                value: './'
+              },
+              {
+                type: 'custom-checkbox',
+                label: '是否压缩精灵图',
+                key: 'isImgMin',
+                value: true
+              },
+              {
+                type: 'custom-checkbox',
+                label: '是否压缩css',
+                key: 'isCssMin',
+                value: false
+              },
+              {
+                type: 'custom-checkbox',
+                label: '是否保存设置',
+                key: 'isSaved',
+                value: false
+              }
+            ]
+          }
+        ]
+      },
       { name: '通用', list: [{ name: '重命名', funcName: 'rename', icon: 'home', disabled: false }] }
     ],
     currentCategory: '',
@@ -93,14 +179,17 @@ var app = new Vue({
     }
   },
   components: {
-    customInput
+    customInput,    
+    customRadio,
+    customCheckbox
+
   },
   methods: {
     addToCurrent(category, action, index) {
       // 当前 可执行操作 为 不可拼接操作，因此不能添加新操作
-      if (this.isSolo) {return;}
+      if (this.isSolo) { return; }
       // 操作列表不为空时不能添加 不可拼接操作
-      if ((this.currentActions.length > 0) && action.isSolo) {return;}
+      if ((this.currentActions.length > 0) && action.isSolo) { return; }
 
       // 判断当前操作类型是否可选
       let isCategoryDisabled = !!this.currentCategory && (category.name !== this.currentCategory) && (category.name !== '通用') && (this.currentCategory !== '通用');
@@ -158,7 +247,7 @@ var app = new Vue({
       }
       console.log(`this.currentCategory: ${this.currentCategory}`);
     },
-    getConfig(){
+    getConfig() {
       console.table(this.currentActions[0].action.configs)
     }
   }
@@ -249,7 +338,7 @@ $(document).ready(function() {
     if (app.currentCategory == '') {
       alert(`当前未选择任何操作`);
       return;
-    }
+    }  
 
     var fileList = e.dataTransfer.files; //获取文件
     var len = fileList.length;
@@ -258,9 +347,21 @@ $(document).ready(function() {
       return false;
     }
 
+
+    let configs = {};
+    app.currentActions.forEach(function(element, index){
+      let cleanConfigs = {};
+      element.action.configs.forEach((item, idx)=>{
+        cleanConfigs[item.key] = item.value;
+      })
+      Object.assign(configs, cleanConfigs);
+    })
+    console.log(configs);
+
+
     // 判断是否批量操作文件
     let isTotal = app.currentActionsName.indexOf('sprite') !== -1;
-    console.log('isTotal',isTotal);
+    console.log('isTotal', isTotal);
     let multiSrc = [];
     let multiFileDir = Path.dirname(fileList[0].path);
 
@@ -268,11 +369,11 @@ $(document).ready(function() {
 
     var handleFUNC = categoryFUNCS[app.currentCategory];
 
-    
+
     //遍历拖进来的文件
     for (var i = 0; i < len; i++) {
       var filepath = fileList[i].path;
-      console.log('遍历拖进来的文件'+filepath);
+      console.log('遍历拖进来的文件' + filepath);
 
       // 获取需要批量操作的文件位置
       if (isTotal) {
@@ -281,7 +382,7 @@ $(document).ready(function() {
         let stats = fs.statSync(filepath);
         if (stats && stats.isDirectory()) {
           multiSrc.push(Path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'));
-          console.log(stats,filepath,Path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'),multiSrc)
+          console.log(stats, filepath, Path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'), multiSrc)
         } else {
           multiSrc.push(filepath);
         }
@@ -297,12 +398,12 @@ $(document).ready(function() {
           fileNameArr = results.split("\\"),
           // 文件名 fileName: test.css
           fileName = fileNameArr[fileNameArr.length - 1];
-          console.log(fileTypeArr, fileType, fileNameArr, fileName);
+        console.log(fileTypeArr, fileType, fileNameArr, fileName);
 
         // 判断文件格式
         if (handleFileType(fileType)) {
           let fileDir = Path.dirname(results),
-            newName = 'test-result.'+fileType,
+            newName = 'test-result.' + fileType,
             fileroute = '';
 
           // 当前目录下新建文件夹
@@ -313,11 +414,12 @@ $(document).ready(function() {
           fileroute = fileDir + '\\';
           console.log('保存到目录:' + fileroute);
 
-          
+
 
 
           //有文件，直接覆盖；没有文件，新建文件
-          handleFUNC(app.currentActionsName, results, fileDir, newName, function() {
+          configs.dest = fileDir;
+          handleFUNC(app.currentActionsName, results, fileDir, configs, function() {
             console.log(results);
           });
         }
@@ -326,10 +428,11 @@ $(document).ready(function() {
 
     // 批量处理文件
     if (isTotal) {
-      console.log('multiSrc'+multiSrc);
+      console.log('multiSrc' + multiSrc);
       //有文件，直接覆盖；没有文件，新建文件
       let newName = '';
-      handleFUNC(app.currentActionsName, multiSrc, multiFileDir, newName, function() {
+      configs.dest = multiFileDir;
+      handleFUNC(app.currentActionsName, multiSrc, multiFileDir, configs, function() {
         console.log(results);
       });
     }
@@ -348,7 +451,7 @@ var handleFileType = (fileType) => {
     'CSS': ['css'],
     'JS': ['js'],
     'HTML': ['html'],
-    'IMAGE': ['png', 'jpg','jpeg', 'gif', 'svg']
+    'IMAGE': ['png', 'jpg', 'jpeg', 'gif', 'svg']
   }
   let availableType = ['css', 'js', 'html', 'png'];
 
@@ -365,7 +468,7 @@ var handleFileType = (fileType) => {
       alert(`请拖进 ${currentTypes.join('/')} 文件～`);
     } else {
       return true;
-    } 
+    }
   } else {
     return true;
   }

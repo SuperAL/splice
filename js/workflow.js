@@ -1,6 +1,7 @@
 var fs = require('fs');
 var Path = require("path");
 var gulp = require('gulp');
+var gulpif = require('gulp-if');
 var postcss = require('gulp-postcss');
 var minifyCSS = require('gulp-cssnano');
 var rename = require('gulp-rename');
@@ -118,12 +119,12 @@ var imageminIMG = (stream) => {
  * @param  {gulp stream}   stream
  * @return {gulp stream}   stream
  */
-var spriteIMG = (stream) => {
+var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, isCssMin, cssDest}) => {
   // Generate our spritesheet
   var spriteData = stream.pipe(spritesmith({
-    imgName: 'sprite.png',
-    cssName: 'sprite.css',
-    imgPath: '../images/sprite.png',
+    imgName: imgName,
+    cssName: cssName,
+    imgPath: imgPath,
     padding: 4
   }));
 
@@ -131,22 +132,23 @@ var spriteIMG = (stream) => {
   var imgStream = spriteData.img
     // DEV: We must buffer our stream into a Buffer for `imagemin`
     .pipe(buffer())
-    .pipe(imagemin())
-    // .pipe(gulp.dest('path/to/image/folder/'));
+    .pipe(gulpif(isImgMin, imagemin()))
+    .pipe(gulp.dest(Path.resolve(dest, imgDest)));
 
   // Pipe CSS stream through CSS optimizer and onto disk
   var cssStream = spriteData.css
-  .pipe(minifyCSS({
+  .pipe(gulpif(isCssMin, minifyCSS({
     safe: true,
     reduceTransforms: false,
     advanced: false,
     compatibility: 'ie7',
     keepSpecialComments: 0
-  }))
-  // .pipe(gulp.dest('path/to/css/folder/'));
+  })))
+  .pipe(gulp.dest(Path.resolve(dest, cssDest)));
 
   // Return a merged stream to handle both `end` events
-  return merge(imgStream, cssStream);
+  // return merge(imgStream, cssStream);
+  return false;
 }
 
 
@@ -263,13 +265,15 @@ var handleJS = (actionsName, src, dist, newName, callback) => {
  * @param  {Function} callback    [文件处理完的回调函数]
  * @return {[type]}               [description]
  */
-var handleIMG = (actionsName, src, dist, newName, callback) => {
+var handleIMG = (actionsName, src, dist, configs, callback) => {
   let stream = gulp.src(src);
   actionsName.forEach(function(element) {
     console.log(`执行操作：${element}`);
-    stream = FUNCS[element](stream, { newName });
+    stream = FUNCS[element](stream, configs);
   })
-  return stream.pipe(gulp.dest(dist));
+  if (stream) {
+    return stream.pipe(gulp.dest(dist));
+  }
 }
 
 
