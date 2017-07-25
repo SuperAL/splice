@@ -132,6 +132,6 @@
 		.btn .icon {
 			width: auto;
 		}
-		.icon:before {
+		.btn-group .icon:before {
 	    padding-right: 5px;
 		}

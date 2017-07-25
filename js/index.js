@@ -93,81 +93,84 @@ var customCheckbox = {
   }
 }
 
+let storedActions = getStore('actions');
+let defaultActions = [
+ {
+    name: 'HTML',
+    list: [
+      { name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false }
+    ]
+  },
+  { name: 'CSS', list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'home', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'light-up', disabled: false }] },
+  { name: 'JS', list: [{ name: '压缩', funcName: 'uglify', icon: 'light-up', disabled: false }] },
+  {
+    name: 'IMAGE',
+    list: [
+      { name: '压缩', funcName: 'imagemin', icon: 'light-up', disabled: false },
+      {
+        name: '精灵图',
+        funcName: 'sprite',
+        icon: 'home',
+        disabled: false,
+        isSolo: true,
+        configs: [{
+            type: 'custom-input',
+            label: '精灵图文件名',
+            key: 'imgName',
+            value: 'sprite.png'
+          },
+          {
+            type: 'custom-input',
+            label: 'css文件名',
+            key: 'cssName',
+            value: 'sprite.css'
+          },
+          {
+            type: 'custom-input',
+            label: 'css中引用的图片地址',
+            key: 'imgPath',
+            value: 'sprite.png'
+          },
+          {
+            type: 'custom-input',
+            label: '精灵图导出地址',
+            key: 'imgDest',
+            value: './'
+          },
+          {
+            type: 'custom-input',
+            label: 'css导出地址',
+            key: 'cssDest',
+            value: './'
+          },
+          {
+            type: 'custom-checkbox',
+            label: '是否压缩精灵图',
+            key: 'isImgMin',
+            value: true
+          },
+          {
+            type: 'custom-checkbox',
+            label: '是否压缩css',
+            key: 'isCssMin',
+            value: false
+          },
+          {
+            type: 'custom-checkbox',
+            label: '是否保存设置',
+            key: 'isSaved',
+            value: false
+          }
+        ]
+      }
+    ]
+  },
+  { name: '通用', list: [{ name: '重命名', funcName: 'rename', icon: 'home', disabled: false }] }
+];
 var app = new Vue({
   el: '#app',
   data: {
-    actions: [{
-        name: 'HTML',
-        list: [
-          { name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false }
-        ]
-      },
-      { name: 'CSS', list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'home', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'light-up', disabled: false }] },
-      { name: 'JS', list: [{ name: '压缩', funcName: 'uglify', icon: 'light-up', disabled: false }] },
-      {
-        name: 'IMAGE',
-        list: [
-          { name: '压缩', funcName: 'imagemin', icon: 'light-up', disabled: false },
-          {
-            name: '精灵图',
-            funcName: 'sprite',
-            icon: 'home',
-            disabled: false,
-            isSolo: true,
-            configs: [{
-                type: 'custom-input',
-                label: '精灵图文件名',
-                key: 'imgName',
-                value: 'sprite.png'
-              },
-              {
-                type: 'custom-input',
-                label: 'css文件名',
-                key: 'cssName',
-                value: 'sprite.css'
-              },
-              {
-                type: 'custom-input',
-                label: 'css中引用的图片地址',
-                key: 'imgPath',
-                value: 'sprite.png'
-              },
-              {
-                type: 'custom-input',
-                label: '精灵图导出地址',
-                key: 'imgDest',
-                value: './'
-              },
-              {
-                type: 'custom-input',
-                label: 'css导出地址',
-                key: 'cssDest',
-                value: './'
-              },
-              {
-                type: 'custom-checkbox',
-                label: '是否压缩精灵图',
-                key: 'isImgMin',
-                value: true
-              },
-              {
-                type: 'custom-checkbox',
-                label: '是否压缩css',
-                key: 'isCssMin',
-                value: false
-              },
-              {
-                type: 'custom-checkbox',
-                label: '是否保存设置',
-                key: 'isSaved',
-                value: false
-              }
-            ]
-          }
-        ]
-      },
-      { name: '通用', list: [{ name: '重命名', funcName: 'rename', icon: 'home', disabled: false }] }
-    ],
+    actions: deepClone(storedActions ? storedActions : defaultActions),
     currentCategory: '',
     currentActions: [],
     isSolo: false // 当前只有一个操作，不能拼接其他操作
@@ -181,7 +184,7 @@ var app = new Vue({
       return arr;
     }
   },
-  components: {
+  components: { 
     customInput,
     customRadio,
     customCheckbox
@@ -207,7 +210,7 @@ var app = new Vue({
 
       // 添加操作
       let selected = {
-        action: action,
+        action: deepClone(action),
         index: index
       }
       this.currentActions.push(selected);
@@ -343,7 +346,7 @@ $(document).ready(function() {
     fileList = Array.prototype.slice.call(fileList);
     let filePaths = [];
     fileList.forEach((file) => {
-      filePaths.push(file.path); 
+      filePaths.push(file.path);
     })
     handleFiles(filePaths);
   });
@@ -395,18 +398,45 @@ var handleFiles = (filePaths) => {
   }
 
 
+
+  // 存储需要保存设置信息的操作
+  let savedConfigs = [];
+  // 存储一次文件处理的所有配置信息
   let configs = {};
   app.currentActions.forEach(function(element, index) {
     if (!element.action.configs) { return; }
     let cleanConfigs = {};
     element.action.configs.forEach((item, idx) => {
       cleanConfigs[item.key] = item.value;
+
+
+      // 只要成功获取到文件列表，即代表保存设置生效
+      // 判断当前操作 是否存在保存设置属性 及 保存设置是否为 true
+      if (element.action.configs.isSaved) {
+        savedConfigs.push(element);
+      }
     })
     Object.assign(configs, cleanConfigs);
   })
-  console.log("configs"+ configs);
+  console.log("configs" + configs);
 
+  // 更新操作数据 及 localStorage 数据
+  let actions = storedActions ? storedActions : defaultActions;
+  actions = deepClone(actions);
+  console.log('beforeChange',actions);
+  savedConfigs.forEach((element) => {
+    let idx = element.index;
+    // let configs = actions[idx[0]]['list'][idx[1]]['configs'];
+    // 更新操作数据
+    console.log('configs before',actions[idx[0]]['list'][idx[1]]['configs']);
+    actions[idx[0]]['list'][idx[1]]['configs'] = element.action.configs;
+    console.log('configs after',actions[idx[0]]['list'][idx[1]]['configs']);
+  }) 
+  // 更新 localStorage 数据
+  console.log('afterChange',actions);
+  setStore('actions', actions) 
 
+  
   // 判断是否批量操作文件
   let isTotal = app.currentActionsName.indexOf('sprite') !== -1;
   console.log('isTotal', isTotal);
