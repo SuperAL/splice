@@ -63,9 +63,21 @@
           </p>
           <p class="desc">＊用法：拖拽CSS文件到下面的线框中，会自动生成名字'-result'的结果css，支持多个文件。
           </p>
-          <div class="dragarea j-dragarea">
-            拖拽文件到这里
+          <div class="get-files-container">
+            <div class="dragarea j-dragarea">
+              <!-- <input type="file" name="files" multiple="true" webkitdirectory directory> -->
+              拖拽文件到这里
+            </div>
+            <div class="btn-group">
+              <button class="btn btn-default get-files">
+                <span class="icon icon-doc-text-inv">选择文件</span>
+              </button>
+              <button class="btn btn-default get-directories">
+                <span class="icon icon-folder">选择文件夹</span>
+              </button>
+            </div>
           </div>
+          
         </div>
       </div>
     </div>

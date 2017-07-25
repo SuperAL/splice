@@ -1,3 +1,6 @@
+const { dialog } = require('electron').remote
+
+
 const categoryFUNCS = {
   'HTML': handleHTML,
   'CSS': handleCSS,
@@ -65,7 +68,7 @@ var customRadio = {
   methods: {
     updateValue(newVal) {
       console.log(newVal);
-      this.$emit('change',newVal);
+      this.$emit('change', newVal);
     }
   }
 }
@@ -85,7 +88,7 @@ var customCheckbox = {
   methods: {
     updateValue(newVal) {
       console.log(newVal);
-      this.$emit('change',newVal);
+      this.$emit('change', newVal);
     }
   }
 }
@@ -179,7 +182,7 @@ var app = new Vue({
     }
   },
   components: {
-    customInput,    
+    customInput,
     customRadio,
     customCheckbox
 
@@ -334,110 +337,156 @@ $(document).ready(function() {
   $('.j-dragarea')[0].addEventListener('drop', function(e) {
     e.preventDefault();
 
-    // 当前未选择任何操作
-    if (app.currentCategory == '') {
-      alert(`当前未选择任何操作`);
-      return;
-    }  
-
-    var fileList = e.dataTransfer.files; //获取文件
-    var len = fileList.length;
-
-    if (len == 0) {
-      return false;
-    }
 
 
-    let configs = {};
-    app.currentActions.forEach(function(element, index){
-      let cleanConfigs = {};
-      element.action.configs.forEach((item, idx)=>{
-        cleanConfigs[item.key] = item.value;
-      })
-      Object.assign(configs, cleanConfigs);
+    let fileList = e.dataTransfer.files; //获取文件
+    fileList = Array.prototype.slice.call(fileList);
+    let filePaths = [];
+    fileList.forEach((file) => {
+      filePaths.push(file.path); 
     })
-    console.log(configs);
-
-
-    // 判断是否批量操作文件
-    let isTotal = app.currentActionsName.indexOf('sprite') !== -1;
-    console.log('isTotal', isTotal);
-    let multiSrc = [];
-    let multiFileDir = Path.dirname(fileList[0].path);
-
-
-
-    var handleFUNC = categoryFUNCS[app.currentCategory];
-
-
-    //遍历拖进来的文件
-    for (var i = 0; i < len; i++) {
-      var filepath = fileList[i].path;
-      console.log('遍历拖进来的文件' + filepath);
-
-      // 获取需要批量操作的文件位置
-      if (isTotal) {
-        // 判断是文件还是文件夹
-        // src/**/*.{jpeg,jpg,png,gif,svg}
-        let stats = fs.statSync(filepath);
-        if (stats && stats.isDirectory()) {
-          multiSrc.push(Path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'));
-          console.log(stats, filepath, Path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'), multiSrc)
-        } else {
-          multiSrc.push(filepath);
-        }
-        continue;
-      }
-
-      // 分别处理单个文件
-      walk(filepath, function(err, results) {
-        console.log('filepath results', results);
-        var fileTypeArr = results.split('.'),
-          // 文件类型 fileType:css
-          fileType = fileTypeArr[fileTypeArr.length - 1],
-          fileNameArr = results.split("\\"),
-          // 文件名 fileName: test.css
-          fileName = fileNameArr[fileNameArr.length - 1];
-        console.log(fileTypeArr, fileType, fileNameArr, fileName);
-
-        // 判断文件格式
-        if (handleFileType(fileType)) {
-          let fileDir = Path.dirname(results),
-            newName = 'test-result.' + fileType,
-            fileroute = '';
-
-          // 当前目录下新建文件夹
-          if (config.cssDir !== '') {
-            fileDir = fileDir + '\\' + config.cssDir;
-          }
-
-          fileroute = fileDir + '\\';
-          console.log('保存到目录:' + fileroute);
-
-
-
-
-          //有文件，直接覆盖；没有文件，新建文件
-          configs.dest = fileDir;
-          handleFUNC(app.currentActionsName, results, fileDir, configs, function() {
-            console.log(results);
-          });
-        }
-      });
-    }
-
-    // 批量处理文件
-    if (isTotal) {
-      console.log('multiSrc' + multiSrc);
-      //有文件，直接覆盖；没有文件，新建文件
-      let newName = '';
-      configs.dest = multiFileDir;
-      handleFUNC(app.currentActionsName, multiSrc, multiFileDir, configs, function() {
-        console.log(results);
-      });
-    }
+    handleFiles(filePaths);
   });
+
+  // 选择文件
+  $('.get-files')[0].addEventListener('click', function(e) {
+    dialog.showOpenDialog({ properties: ['openFile', 'multiSelections'] }, (filePaths) => {
+      console.log(filePaths);
+      handleFiles(filePaths);
+    })
+  })
+  // 选择文件夹 
+  $('.get-directories')[0].addEventListener('click', function(e) {
+    dialog.showOpenDialog({ properties: ['openDirectory', 'multiSelections'] }, (filePaths) => {
+      console.log(filePaths);
+      handleFiles(filePaths);
+    })
+  })
+
+  // 点击出现选择文件框
+  // $('.j-dragarea')[0].addEventListener('click', function(e) {
+  //   // dialog.showOpenDialog({properties: ['openFile', 'openDirectory', 'multiSelections']}, (filePaths)=>{
+  //   //   console.log(filePaths);
+  //   // })
+  //   $('.j-dragarea input').trigger('click');
+  // })
+
+  // $('.j-dragarea input')[0].addEventListener('change', function(e){
+  //   console.log(e.target.files);
+  //   let filePaths = Array.prototype.slice.call(e.target.files);
+
+  //   filePaths.forEach((file)=>{
+  //     console.log(file.path);  // 原生 input 只能获取文件或者文件夹位置，不能同时获取到
+  //   })
+  // })
 });
+
+var handleFiles = (filePaths) => {
+  // 当前未选择任何操作
+  if (app.currentCategory == '') {
+    alert(`当前未选择任何操作`);
+    return;
+  }
+  var len = filePaths.length;
+
+  if (len == 0) {
+    console.log(filePaths.length);
+    return false;
+  }
+
+
+  let configs = {};
+  app.currentActions.forEach(function(element, index) {
+    if (!element.action.configs) { return; }
+    let cleanConfigs = {};
+    element.action.configs.forEach((item, idx) => {
+      cleanConfigs[item.key] = item.value;
+    })
+    Object.assign(configs, cleanConfigs);
+  })
+  console.log("configs"+ configs);
+
+
+  // 判断是否批量操作文件
+  let isTotal = app.currentActionsName.indexOf('sprite') !== -1;
+  console.log('isTotal', isTotal);
+  let multiSrc = [];
+  let multiFileDir = Path.dirname(filePaths[0]);
+
+
+
+  var handleFUNC = categoryFUNCS[app.currentCategory];
+
+
+  //遍历拖进来的文件
+  for (var i = 0; i < len; i++) {
+    var filepath = filePaths[i];
+    console.log('遍历拖进来的文件' + filepath);
+
+    // 获取需要批量操作的文件位置
+    if (isTotal) {
+      // 判断是文件还是文件夹
+      // src/**/*.{jpeg,jpg,png,gif,svg}
+      let stats = fs.statSync(filepath);
+      if (stats && stats.isDirectory()) {
+        multiSrc.push(Path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'));
+        console.log(stats, filepath, Path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'), multiSrc)
+      } else {
+        multiSrc.push(filepath);
+      }
+      continue;
+    }
+
+    // 分别处理单个文件
+    walk(filepath, function(err, results) {
+      console.log('filepath results', results);
+      var fileTypeArr = results.split('.'),
+        // 文件类型 fileType:css
+        fileType = fileTypeArr[fileTypeArr.length - 1],
+        fileNameArr = results.split("\\"),
+        // 文件名 fileName: test.css
+        fileName = fileNameArr[fileNameArr.length - 1];
+      console.log(fileTypeArr, fileType, fileNameArr, fileName);
+
+      // 判断文件格式
+      if (handleFileType(fileType)) {
+        let fileDir = Path.dirname(results),
+          newName = 'test-result.' + fileType,
+          fileroute = '';
+
+        // 当前目录下新建文件夹
+        if (config.cssDir !== '') {
+          fileDir = fileDir + '\\' + config.cssDir;
+        }
+
+        fileroute = fileDir + '\\';
+        console.log('保存到目录:' + fileroute);
+
+
+
+
+        //有文件，直接覆盖；没有文件，新建文件
+        configs.dest = fileDir;
+        handleFUNC(app.currentActionsName, results, fileDir, configs, function() {
+          console.log(results);
+        });
+      }
+    });
+  }
+
+  // 批量处理文件
+  if (isTotal) {
+    console.log('multiSrc' + multiSrc);
+    //有文件，直接覆盖；没有文件，新建文件
+    let newName = '';
+    configs.dest = multiFileDir;
+    handleFUNC(app.currentActionsName, multiSrc, multiFileDir, configs, function() {
+      console.log(results);
+    });
+  }
+}
+
+
 
 /**
  * 判断文件类型
@@ -447,6 +496,7 @@ $(document).ready(function() {
  * @return {boolean}           [是否符合格式]
  */
 var handleFileType = (fileType) => {
+  console.log(`inside handleFileType function`);
   let typeOptions = {
     'CSS': ['css'],
     'JS': ['js'],
