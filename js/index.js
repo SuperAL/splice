@@ -171,8 +171,7 @@ let defaultActions = [{
       funcName: 'rename',
       icon: 'home',
       disabled: false,
-      configs: [
-        {
+      configs: [{
           type: 'custom-input',
           label: '文件名',
           key: 'basename',
@@ -196,6 +195,25 @@ let defaultActions = [{
           key: 'extname',
           value: '', // 默认原文件扩展名
           placeholder: '默认原文件扩展名'
+        },
+        {
+          type: 'custom-checkbox',
+          label: '是否保存设置',
+          key: 'isSaved',
+          value: false
+        }
+      ]
+    }, {
+      name: '自定义设置',
+      funcName: 'dest',
+      icon: 'home',
+      disabled: false,
+      configs: [{
+          type: 'custom-input',
+          label: '导出目录',
+          key: 'dest',
+          value: '', // 默认文件当前目录
+          placeholder: '默认文件当前目录'
         },
         {
           type: 'custom-checkbox',
@@ -428,8 +446,8 @@ $(document).ready(function() {
 });
 
 var handleFiles = (filePaths) => {
-  if (!filePaths) {return;} // 取消选择文件的情况
-  
+  if (!filePaths) { return; } // 取消选择文件的情况
+
   // 当前未选择任何操作
   if (app.currentCategory == '') {
     alert(`当前未选择任何操作`);
@@ -542,16 +560,16 @@ var handleFiles = (filePaths) => {
         // 如果未设置 basename 和 extname，默认使用原文件的信息
         if (app.currentActionsName.indexOf('rename') !== -1) {
           let basename = fileName.split('.')[0];
-          let re = new RegExp(basename,'gi');
+          let re = new RegExp(basename, 'gi');
           let extname = fileName.replace(re, '');
-          configs.basename = !!configs.basename ? configs.basename : basename;          
+          configs.basename = !!configs.basename ? configs.basename : basename;
           configs.extname = !!configs.extname ? configs.extname : extname;
         }
 
-
+        // 判断是否设置了 导出目录，默认导出到当前目录，存在 configs 里面是为了让 spriteIMG 操作可以获取到
+        configs.dest = !!configs.dest ? Path.resolve(fileDir,configs.dest) : fileDir;
         //有文件，直接覆盖；没有文件，新建文件
-        configs.dest = fileDir;
-        handleFUNC(app.currentActionsName, results, fileDir, configs, function() {
+        handleFUNC(app.currentActionsName, results, configs.dest, configs, function() {
           console.log(results);
         });
       }
@@ -561,10 +579,11 @@ var handleFiles = (filePaths) => {
   // 批量处理文件
   if (isTotal) {
     console.log('multiSrc' + multiSrc);
-    //有文件，直接覆盖；没有文件，新建文件
     let newName = '';
-    configs.dest = multiFileDir;
-    handleFUNC(app.currentActionsName, multiSrc, multiFileDir, configs, function() {
+    // 判断是否设置了 导出目录，默认导出到当前目录，存在 configs 里面是为了让 spriteIMG 操作可以获取到
+    configs.dest = !!configs.dest ? Path.resolve(multiFileDir,configs.dest) : multiFileDir;
+    //有文件，直接覆盖；没有文件，新建文件
+    handleFUNC(app.currentActionsName, multiSrc, configs.dest, configs, function() {
       console.log(results);
     });
   }

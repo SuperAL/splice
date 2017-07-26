@@ -180,7 +180,16 @@ var renameALL = (stream, { basename, prefix, suffix, extname}) => {
   }))
 }
 
-
+/**
+ * 不执行任何操作
+ * @author Alexee
+ * @date   2017-07-26
+ * @param  {[type]}   stream [description]
+ * @return {[type]}          [description]
+ */
+var doNothing = (stream) => {
+  return stream;
+}
 
 
 
@@ -196,7 +205,8 @@ const FUNCS = {
   'imagemin': imageminIMG,
   'sprite': spriteIMG,
   // common
-  'rename': renameALL
+  'rename': renameALL,
+  'dest': doNothing
 }
 
 /**
@@ -258,7 +268,7 @@ var handleJS = (actionsName, src, dist, configs, callback) => {
   let stream = gulp.src(src);
   actionsName.forEach(function(element) {
     console.log(`执行操作：${element}`);
-    stream = FUNCS[element](stream, configs);
+      stream = FUNCS[element](stream, configs);
   })
   return stream.pipe(gulp.dest(dist));
 }
