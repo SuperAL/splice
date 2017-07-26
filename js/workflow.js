@@ -18,6 +18,10 @@ var spritesmith = require('gulp.spritesmith');
 var buffer = require('vinyl-buffer');
 var merge = require('merge-stream');
 
+// usemin
+var usemin = require('gulp-usemin2');
+var cleanCSS = require('gulp-clean-css');
+
 /**
  * -----------------------------------------------------------------
  * HTML 文件相关操作
@@ -32,6 +36,28 @@ var merge = require('merge-stream');
  */
 var minifyHTML = (stream) => {
   return stream.pipe(htmlmin({ collapseWhitespace: true }))
+}
+
+/**
+ * gulp-usemin gulp-rev - 合并 html 引用的 css、js
+ * @author Alexee
+ * @date   2017-07-26
+ * @param  {[type]}   stream [description]
+ * @return {[type]}          [description]
+ */
+var useminHTML = (stream, {isUglify, isRev}) => {
+  return stream.pipe(usemin({
+    // cssmin: cleanCSS(), // 使用 css 压缩会导致无法生成最终的 css 文件
+    jsmin: isUglify && uglify() , 
+    rev: isRev
+
+    // 以下为 gulp-usemin 用法
+    // css: [ minifyCSS(), rev() ],    
+    // html: [ htmlmin({ collapseWhitespace: true }) ],
+    // js: [ uglify(), rev() ],
+    // inlinejs: [ uglify() ]
+    // inlinecss: [ cleanCss(), 'concat' ]
+  }))
 }
 
 
@@ -196,6 +222,7 @@ var doNothing = (stream) => {
 const FUNCS = {
   // html
   'htmlmin': minifyHTML,
+  'usemin': useminHTML,
   // css
   'prefix': prefixCSS,
   'compress': compressCSS,
@@ -227,7 +254,7 @@ var handleHTML = (actionsName, src, dist, configs, callback) => {
     console.log(`执行操作：${element}`);
     stream = FUNCS[element](stream, configs);
   })
-  return stream.pipe(gulp.dest(dist));
+    return stream.pipe(gulp.dest(dist));
 }
 
 

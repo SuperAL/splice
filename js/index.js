@@ -97,7 +97,25 @@ let storedActions = getStore('actions');
 let defaultActions = [{
     name: 'HTML',
     list: [
-      { name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false }
+      { name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false },{ name: '合并 css/js', funcName: 'usemin', icon: 'light-up', disabled: false, isSolo: true, configs: [
+      {
+        type: 'custom-checkbox',
+        label: '是否压缩合并后的 js',
+        key: 'isUglify',
+        value: false
+      },{
+        type: 'custom-checkbox',
+        label: '是否添加版本号',
+        key: 'isRev',
+        value: false
+      },
+      {
+        type: 'custom-checkbox',
+        label: '是否保存设置',
+        key: 'isSaved',
+        value: false
+      }
+      ] }
     ]
   },
   { name: 'CSS', list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'home', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'light-up', disabled: false }] },
@@ -567,7 +585,7 @@ var handleFiles = (filePaths) => {
         }
 
         // 判断是否设置了 导出目录，默认导出到当前目录，存在 configs 里面是为了让 spriteIMG 操作可以获取到
-        configs.dest = !!configs.dest ? Path.resolve(fileDir,configs.dest) : fileDir;
+        configs.dest = !!configs.dest ? Path.resolve(fileDir, configs.dest) : fileDir;
         //有文件，直接覆盖；没有文件，新建文件
         handleFUNC(app.currentActionsName, results, configs.dest, configs, function() {
           console.log(results);
@@ -581,7 +599,7 @@ var handleFiles = (filePaths) => {
     console.log('multiSrc' + multiSrc);
     let newName = '';
     // 判断是否设置了 导出目录，默认导出到当前目录，存在 configs 里面是为了让 spriteIMG 操作可以获取到
-    configs.dest = !!configs.dest ? Path.resolve(multiFileDir,configs.dest) : multiFileDir;
+    configs.dest = !!configs.dest ? Path.resolve(multiFileDir, configs.dest) : multiFileDir;
     //有文件，直接覆盖；没有文件，新建文件
     handleFUNC(app.currentActionsName, multiSrc, configs.dest, configs, function() {
       console.log(results);
