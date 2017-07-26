@@ -162,13 +162,22 @@ var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, is
 /**
  * gulp-rename - 重命名
  * @author Alexee
- * @date   2017-07-21
- * @param  {gulp stream}   stream
- * @param  {string}        newName [新的文件名]
- * @return {gulp stream}   stream
+ * @date   2017-07-26
+ * @param  {gulp stream}   stream           
+ * @param  {[type]}   options.basename [文件名]
+ * @param  {[type]}   options.prefix   [前缀]
+ * @param  {[type]}   options.suffix   [后缀]
+ * @param  {[type]}   options.extname  [扩展名]
+ * @return {[type]}                    [description]
  */
-var renameALL = (stream, { newName }) => {
-  return stream.pipe(rename(newName))
+var renameALL = (stream, { basename, prefix, suffix, extname}) => {
+  console.log(basename, prefix, suffix, extname);
+  return stream.pipe(rename({
+    basename: basename,
+    prefix: prefix,
+    suffix: suffix,
+    extname: extname
+  }))
 }
 
 
@@ -197,16 +206,16 @@ const FUNCS = {
  * @param  {array}   actionsName  [需要执行的操作]
  * @param  {string}   src         [处理的文件地址]
  * @param  {string}   dist        [文件导出地址]
- * @param  {string}   newName     [文件重命名]
+ * @param  {object}   configs     [操作设置]
  * @param  {Function} callback    [文件处理完的回调函数]
  * @return {[type]}               [description]
  */
-var handleHTML = (actionsName, src, dist, newName, callback) => {
-  console.log(actionsName, src, dist, newName, callback);
+var handleHTML = (actionsName, src, dist, configs, callback) => {
+  console.log(actionsName, src, dist, configs, callback);
   let stream = gulp.src(src);
   actionsName.forEach(function(element) {
     console.log(`执行操作：${element}`);
-    stream = FUNCS[element](stream, { newName });
+    stream = FUNCS[element](stream, configs);
   })
   return stream.pipe(gulp.dest(dist));
 }
@@ -220,16 +229,16 @@ var handleHTML = (actionsName, src, dist, newName, callback) => {
  * @param  {array}   actionsName  [需要执行的操作]
  * @param  {string}   src         [处理的文件地址]
  * @param  {string}   dist        [文件导出地址]
- * @param  {string}   newName     [文件重命名]
+ * @param  {string}   configs     [操作设置]
  * @param  {Function} callback    [文件处理完的回调函数]
  * @return {[type]}               [description]
  */
-var handleCSS = (actionsName, src, dist, newName, callback) => {
-  console.log(actionsName, src, dist, newName, callback);
+var handleCSS = (actionsName, src, dist, configs, callback) => {
+  console.log(actionsName, src, dist, configs, callback);
   let stream = gulp.src(src);
   actionsName.forEach(function(element) {
     console.log(`执行操作：${element}`);
-    stream = FUNCS[element](stream, { newName });
+    stream = FUNCS[element](stream, configs);
   })
   return stream.pipe(gulp.dest(dist));
 }
@@ -241,15 +250,15 @@ var handleCSS = (actionsName, src, dist, newName, callback) => {
  * @param  {array}   actionsName  [需要执行的操作]
  * @param  {string}   src         [处理的文件地址]
  * @param  {string}   dist        [文件导出地址]
- * @param  {string}   newName     [文件重命名]
+ * @param  {string}   configs     [操作设置]
  * @param  {Function} callback    [文件处理完的回调函数]
  * @return {[type]}               [description]
  */
-var handleJS = (actionsName, src, dist, newName, callback) => {
+var handleJS = (actionsName, src, dist, configs, callback) => {
   let stream = gulp.src(src);
   actionsName.forEach(function(element) {
     console.log(`执行操作：${element}`);
-    stream = FUNCS[element](stream, { newName });
+    stream = FUNCS[element](stream, configs);
   })
   return stream.pipe(gulp.dest(dist));
 }
@@ -261,7 +270,7 @@ var handleJS = (actionsName, src, dist, newName, callback) => {
  * @param  {array}   actionsName  [需要执行的操作]
  * @param  {string}   src         [处理的文件地址]
  * @param  {string}   dist        [文件导出地址]
- * @param  {string}   newName     [文件重命名]
+ * @param  {string}   configs     [操作设置]
  * @param  {Function} callback    [文件处理完的回调函数]
  * @return {[type]}               [description]
  */
@@ -271,6 +280,7 @@ var handleIMG = (actionsName, src, dist, configs, callback) => {
     console.log(`执行操作：${element}`);
     stream = FUNCS[element](stream, configs);
   })
+  // 精灵图操作 stream 返回 false
   if (stream) {
     return stream.pipe(gulp.dest(dist));
   }
@@ -284,15 +294,15 @@ var handleIMG = (actionsName, src, dist, configs, callback) => {
  * @param  {array}   actionsName  [需要执行的操作]
  * @param  {string}   src         [处理的文件地址]
  * @param  {string}   dist        [文件导出地址]
- * @param  {string}   newName     [文件重命名]
+ * @param  {string}   configs     [操作设置]
  * @param  {Function} callback    [文件处理完的回调函数]
  * @return {[type]}               [description]
  */
- var handleALL = (actionsName, src, dist, newName, callback) => {
+ var handleALL = (actionsName, src, dist, configs, callback) => {
   let stream = gulp.src(src);
   actionsName.forEach(function(element) {
     console.log(`执行操作：${element}`);
-    stream = FUNCS[element](stream, { newName });
+    stream = FUNCS[element](stream, configs);
   })
   return stream.pipe(gulp.dest(dist));
 }

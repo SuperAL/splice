@@ -33,10 +33,10 @@ var customInput = {
     prop: 'userValue',
     event: 'change'
   },
-  props: ['label', 'userValue'],
+  props: ['label', 'userValue', 'placeholder'],
   template: `<div class="form-group">
     <label>{{label}}</label>
-    <input type="text" class="form-control" placeholder="Email" :value="userValue"  @input="updateValue($event.target.value)">
+    <input type="text" class="form-control" :placeholder="placeholder" :value="userValue"  @input="updateValue($event.target.value)">
   </div>`,
   methods: {
     updateValue(newVal) {
@@ -94,8 +94,7 @@ var customCheckbox = {
 }
 
 let storedActions = getStore('actions');
-let defaultActions = [
- {
+let defaultActions = [{
     name: 'HTML',
     list: [
       { name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false }
@@ -165,7 +164,48 @@ let defaultActions = [
       }
     ]
   },
-  { name: '通用', list: [{ name: '重命名', funcName: 'rename', icon: 'home', disabled: false }] }
+  {
+    name: '通用',
+    list: [{
+      name: '重命名',
+      funcName: 'rename',
+      icon: 'home',
+      disabled: false,
+      configs: [
+        {
+          type: 'custom-input',
+          label: '文件名',
+          key: 'basename',
+          value: '', // 默认原文件名
+          placeholder: '默认原文件名'
+        }, {
+          type: 'custom-input',
+          label: '前缀',
+          key: 'prefix',
+          value: '',
+          placeholder: '例: bonjour-'
+        }, {
+          type: 'custom-input',
+          label: '后缀',
+          key: 'suffix',
+          value: '',
+          placeholder: '例: -hola'
+        }, {
+          type: 'custom-input',
+          label: '扩展名',
+          key: 'extname',
+          value: '', // 默认原文件扩展名
+          placeholder: '默认原文件扩展名'
+        },
+        {
+          type: 'custom-checkbox',
+          label: '是否保存设置',
+          key: 'isSaved',
+          value: false
+        }
+      ]
+    }]
+  }
 ];
 var app = new Vue({
   el: '#app',
@@ -184,7 +224,7 @@ var app = new Vue({
       return arr;
     }
   },
-  components: { 
+  components: {
     customInput,
     customRadio,
     customCheckbox
@@ -213,9 +253,9 @@ var app = new Vue({
         action: deepClone(action),
         index: index
       }
-      console.log('action',action);   
-      console.log('selected',selected);
-        
+      console.log('action', action);
+      console.log('selected', selected);
+
       this.currentActions.push(selected);
       // 禁用已选操作
       this.actions[index[0]].list[index[1]].disabled = true;
@@ -388,6 +428,8 @@ $(document).ready(function() {
 });
 
 var handleFiles = (filePaths) => {
+  if (!filePaths) {return;} // 取消选择文件的情况
+  
   // 当前未选择任何操作
   if (app.currentCategory == '') {
     alert(`当前未选择任何操作`);
@@ -410,24 +452,25 @@ var handleFiles = (filePaths) => {
     if (!element.action.configs) { return; }
     let cleanConfigs = {};
     element.action.configs.forEach((item, idx) => {
+
       cleanConfigs[item.key] = item.value;
 
 
       // 只要成功获取到文件列表，即代表保存设置生效
       // 判断当前操作 是否存在保存设置属性 及 保存设置是否为 true
-      if ((item.key == 'isSaved') && item.value ) {
-        console.log('isSaved',element);
+      if ((item.key == 'isSaved') && item.value) {
+        console.log('isSaved', element);
         savedConfigs.push(element);
       }
     })
     Object.assign(configs, cleanConfigs);
   })
-  console.log("configs" + configs);
+  console.log("configs", configs);
 
   // 更新操作数据 及 localStorage 数据
   let actions = storedActions ? storedActions : defaultActions;
   actions = deepClone(actions);
-  console.log('beforeChange',actions);
+  console.log('beforeChange', actions);
   savedConfigs.forEach((element) => {
     let idx = element.index;
     // let configs = actions[idx[0]]['list'][idx[1]]['configs'];
@@ -435,12 +478,12 @@ var handleFiles = (filePaths) => {
     app.actions[idx[0]]['list'][idx[1]]['configs'] = element.action.configs;
     // 更新存于 localStorage 的操作数据，不同之处在于操作项的 disabled 属性值
     actions[idx[0]]['list'][idx[1]]['configs'] = element.action.configs;
-  }) 
+  })
   // 更新 localStorage 数据
-  console.log('afterChange',actions);
-  setStore('actions', actions) 
+  console.log('afterChange', actions);
+  setStore('actions', actions)
 
-  
+
   // 判断是否批量操作文件
   let isTotal = app.currentActionsName.indexOf('sprite') !== -1;
   console.log('isTotal', isTotal);
@@ -496,7 +539,14 @@ var handleFiles = (filePaths) => {
         fileroute = fileDir + '\\';
         console.log('保存到目录:' + fileroute);
 
-
+        // 如果未设置 basename 和 extname，默认使用原文件的信息
+        if (app.currentActionsName.indexOf('rename') !== -1) {
+          let basename = fileName.split('.')[0];
+          let re = new RegExp(basename,'gi');
+          let extname = fileName.replace(re, '');
+          configs.basename = !!configs.basename ? configs.basename : basename;          
+          configs.extname = !!configs.extname ? configs.extname : extname;
+        }
 
 
         //有文件，直接覆盖；没有文件，新建文件

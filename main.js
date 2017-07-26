@@ -33,7 +33,7 @@ function createWindow() {
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
 
-  // 刷新页面 快捷键
+  // 刷新页面 快捷键 Ctrl+Alt+R
   globalShortcut.register('Ctrl+Alt+R', function () {
     mainWindow.webContents.reload();
   })
