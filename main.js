@@ -3,6 +3,7 @@ const electron = require('electron')
 const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
+const globalShortcut = electron.globalShortcut
 
 require('electron-reload')(__dirname, { ignored: /node_modules|[\/\\]\./ });
 
@@ -14,6 +15,8 @@ const url = require('url')
 let mainWindow
 
 function createWindow() {
+
+
   // Create the browser window.
   mainWindow = new BrowserWindow({ minWidth: 800, minHeight: 600 })
 
@@ -29,6 +32,11 @@ function createWindow() {
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
+
+  // 刷新页面 快捷键
+  globalShortcut.register('Ctrl+Alt+R', function () {
+    mainWindow.webContents.reload();
+  })
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
@@ -61,5 +69,12 @@ app.on('activate', function() {
   }
 })
 
+app.on('will-quit', function() {
+  // Unregister a shortcut.
+  // globalShortcut.unregister('ctrl+x');
+
+  // Unregister all shortcuts.
+  globalShortcut.unregisterAll();
+});
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.

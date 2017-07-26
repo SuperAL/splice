@@ -213,6 +213,9 @@ var app = new Vue({
         action: deepClone(action),
         index: index
       }
+      console.log('action',action);   
+      console.log('selected',selected);
+        
       this.currentActions.push(selected);
       // 禁用已选操作
       this.actions[index[0]].list[index[1]].disabled = true;
@@ -412,7 +415,8 @@ var handleFiles = (filePaths) => {
 
       // 只要成功获取到文件列表，即代表保存设置生效
       // 判断当前操作 是否存在保存设置属性 及 保存设置是否为 true
-      if (element.action.configs.isSaved) {
+      if ((item.key == 'isSaved') && item.value ) {
+        console.log('isSaved',element);
         savedConfigs.push(element);
       }
     })
@@ -427,10 +431,10 @@ var handleFiles = (filePaths) => {
   savedConfigs.forEach((element) => {
     let idx = element.index;
     // let configs = actions[idx[0]]['list'][idx[1]]['configs'];
-    // 更新操作数据
-    console.log('configs before',actions[idx[0]]['list'][idx[1]]['configs']);
+    // 更新当前操作数据
+    app.actions[idx[0]]['list'][idx[1]]['configs'] = element.action.configs;
+    // 更新存于 localStorage 的操作数据，不同之处在于操作项的 disabled 属性值
     actions[idx[0]]['list'][idx[1]]['configs'] = element.action.configs;
-    console.log('configs after',actions[idx[0]]['list'][idx[1]]['configs']);
   }) 
   // 更新 localStorage 数据
   console.log('afterChange',actions);
