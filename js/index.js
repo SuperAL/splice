@@ -97,7 +97,7 @@ let storedActions = getStore('actions');
 let defaultActions = [{
     name: 'HTML',
     list: [
-      { name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false },{ name: '合并 css/js', funcName: 'usemin', icon: 'light-up', disabled: false, isSolo: true, configs: [
+      { name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false },{ name: '合并 css / js', funcName: 'usemin', icon: 'light-up', disabled: false, isSolo: true, configs: [
       {
         type: 'custom-checkbox',
         label: '是否压缩合并后的 js',
@@ -249,6 +249,8 @@ var app = new Vue({
     actions: deepClone(storedActions ? storedActions : defaultActions),
     currentCategory: '',
     currentActions: [],
+    isLoading: false,
+    currentStatus: '',
     isSolo: false // 当前只有一个操作，不能拼接其他操作
   },
   computed: {
@@ -587,8 +589,14 @@ var handleFiles = (filePaths) => {
         // 判断是否设置了 导出目录，默认导出到当前目录，存在 configs 里面是为了让 spriteIMG 操作可以获取到
         configs.dest = !!configs.dest ? Path.resolve(fileDir, configs.dest) : fileDir;
         //有文件，直接覆盖；没有文件，新建文件
-        handleFUNC(app.currentActionsName, results, configs.dest, configs, function() {
-          console.log(results);
+        app.isLoading = true;
+        handleFUNC(app.currentActionsName, results, configs.dest, configs, function(currentStatus) {
+          if (currentStatus == 'finished') {
+            app.isLoading = false;
+            app.currentStatus = '';
+          } else {
+            app.currentStatus = `执行操作：${currentStatus}`;
+          }
         });
       }
     });
@@ -601,8 +609,16 @@ var handleFiles = (filePaths) => {
     // 判断是否设置了 导出目录，默认导出到当前目录，存在 configs 里面是为了让 spriteIMG 操作可以获取到
     configs.dest = !!configs.dest ? Path.resolve(multiFileDir, configs.dest) : multiFileDir;
     //有文件，直接覆盖；没有文件，新建文件
-    handleFUNC(app.currentActionsName, multiSrc, configs.dest, configs, function() {
-      console.log(results);
+    app.isLoading = true;
+    console.log(app.isLoading);
+    handleFUNC(app.currentActionsName, multiSrc, configs.dest, configs, function(currentStatus) {
+      console.log('currentStatus', currentStatus);
+      if (currentStatus == 'finished') {
+        app.isLoading = false;
+        app.currentStatus = '';
+      } else {
+        app.currentStatus = `执行操作：${currentStatus}`;
+      }
     });
   }
 }

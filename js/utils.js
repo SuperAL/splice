@@ -25,7 +25,7 @@ const removeStore = name => {
 	window.localStorage.removeItem(name);
 }
 
-// 深拷贝
+// 深拷贝，对方法无效
 const deepClone = source => {
 	return JSON.parse(JSON.stringify(source));
 }

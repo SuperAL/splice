@@ -7,6 +7,7 @@
     "dev": "browser-sync start --server --no-notify --files '**'",
     "start": "electron .",
     "watch": "watchify js/es6.js -t babelify -o js/index.js --debug --verbose",
+    "quickexe": "electron-packager .",
     "package": "electron-packager ./ DemoApps --overwrite --app-version=1.0.0 --platform=win32 --arch=all --out=../DemoApps --version=1.2.1 --icon=./public/img/app-icon.icns"
   },
   "repository": "https://github.com/SuperAL/splice.git",
@@ -31,19 +32,15 @@
     "gulp-uglify": "^3.0.0",
     "gulp-usemin": "^0.3.28",
     "gulp-usemin2": "^0.2.4",
+    "gulp-watch": "^4.3.11",
     "gulp.spritesmith": "^6.5.1",
     "imagemin-pngquant": "^5.0.1",
     "merge-stream": "^1.0.1",
     "vinyl-buffer": "^1.0.0"
   },
   "devDependencies": {
-    "babel-preset-es2015": "^6.24.1",
-    "babelify": "^7.3.0",
-    "browser-sync": "^2.18.12",
-    "browserify": "^14.4.0",
     "electron": "^1.6.11",
     "electron-packager": "^8.7.2",
-    "electron-reload": "^1.2.1",
-    "watchify": "^3.9.0"
+    "electron-reload": "^1.2.1"
   }
 }

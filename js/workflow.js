@@ -22,6 +22,8 @@ var merge = require('merge-stream');
 var usemin = require('gulp-usemin2');
 var cleanCSS = require('gulp-clean-css');
 
+var watch = require('gulp-watch');
+
 /**
  * -----------------------------------------------------------------
  * HTML 文件相关操作
@@ -145,7 +147,7 @@ var imageminIMG = (stream) => {
  * @param  {gulp stream}   stream
  * @return {gulp stream}   stream
  */
-var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, isCssMin, cssDest}) => {
+var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, isCssMin, cssDest, callback}) => {
   // Generate our spritesheet
   var spriteData = stream.pipe(spritesmith({
     imgName: imgName,
@@ -153,13 +155,20 @@ var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, is
     imgPath: imgPath,
     padding: 4
   }));
-
+  let imgFinal = Path.resolve(dest, imgDest);
+  let cssFinal = Path.resolve(dest, cssDest);
   // Pipe image stream through image optimizer and onto disk
   var imgStream = spriteData.img
     // DEV: We must buffer our stream into a Buffer for `imagemin`
     .pipe(buffer())
-    .pipe(gulpif(isImgMin, imagemin()))
-    .pipe(gulp.dest(Path.resolve(dest, imgDest)));
+    .pipe(gulpif(isImgMin, imagemin([
+      imagemin.gifsicle({ interlaced: true }),
+      imagemin.jpegtran({ progressive: true }),
+    // imagemin.optipng({ optimizationLevel: 5 }),
+    imagemin.svgo({ plugins: [{ removeViewBox: true }] }),
+    pngquant()
+    ])))
+    .pipe(gulp.dest(imgFinal));
 
   // Pipe CSS stream through CSS optimizer and onto disk
   var cssStream = spriteData.css
@@ -170,8 +179,26 @@ var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, is
     compatibility: 'ie7',
     keepSpecialComments: 0
   })))
-  .pipe(gulp.dest(Path.resolve(dest, cssDest)));
+  .pipe(gulp.dest(cssFinal));
 
+  // 监听 img 和 css 文件的生成，都生成成功后再停止 loading
+  let watchFilepathImg = Path.resolve(imgFinal, '*.{jpeg,jpg,png,gif,svg}');
+  let watchFilepathCss = Path.resolve(cssFinal, '*.css');
+  let isImgFin = false, isCssFin = false;
+  let watcherImg = watch(watchFilepathImg, function () {
+    if (isCssFin) {
+      callback('finished')
+    }
+    isImgFin = true;
+    watcherImg.close();
+  });
+  let watcherCss = watch(watchFilepathCss, function () {
+    if (isImgFin) {
+      callback('finished')
+    }
+    isCssFin = true;
+    watcherCss.close();
+  });
   // Return a merged stream to handle both `end` events
   // return merge(imgStream, cssStream);
   return false;
@@ -235,7 +262,22 @@ const FUNCS = {
   'rename': renameALL,
   'dest': doNothing
 }
-
+const LOGS = {
+  // html
+  'htmlmin': '压缩 html',
+  'usemin': '合并 css/js',
+  // css
+  'prefix': '添加兼容性前缀',
+  'compress': '压缩 css',
+  // js
+  'uglify': '压缩 js',
+  // image
+  'imagemin': '压缩图片',
+  'sprite': '合并生成精灵图',
+  // common
+  'rename': '文件重命名',
+  'dest': '设置导出目录'
+}
 /**
  * 处理 html 文件
  * @author Alexee
@@ -252,9 +294,16 @@ var handleHTML = (actionsName, src, dist, configs, callback) => {
   let stream = gulp.src(src);
   actionsName.forEach(function(element) {
     console.log(`执行操作：${element}`);
+    callback(LOGS[element])
     stream = FUNCS[element](stream, configs);
   })
-    return stream.pipe(gulp.dest(dist));
+  let watchFilepath = Path.resolve(dist, '*.html');
+  stream.pipe(gulp.dest(dist));
+  let watcher = watch(watchFilepath, function () {
+    callback('finished')
+    watcher.close();
+    console.log('watching');
+  });
 }
 
 
@@ -275,9 +324,16 @@ var handleCSS = (actionsName, src, dist, configs, callback) => {
   let stream = gulp.src(src);
   actionsName.forEach(function(element) {
     console.log(`执行操作：${element}`);
+    callback(LOGS[element])
     stream = FUNCS[element](stream, configs);
   })
-  return stream.pipe(gulp.dest(dist));
+  let watchFilepath = Path.resolve(dist, '*.css');
+  stream.pipe(gulp.dest(dist));
+  let watcher = watch(watchFilepath, function () {
+    callback('finished')
+    watcher.close();
+    console.log('watching');
+  });
 }
 
 /**
@@ -295,9 +351,16 @@ var handleJS = (actionsName, src, dist, configs, callback) => {
   let stream = gulp.src(src);
   actionsName.forEach(function(element) {
     console.log(`执行操作：${element}`);
+    callback(LOGS[element])
       stream = FUNCS[element](stream, configs);
   })
-  return stream.pipe(gulp.dest(dist));
+  let watchFilepath = Path.resolve(dist, '*.js');
+  stream.pipe(gulp.dest(dist));
+  let watcher = watch(watchFilepath, function () {
+    callback('finished')
+    watcher.close();
+    console.log('watching');
+  });
 }
 
 /**
@@ -315,12 +378,23 @@ var handleIMG = (actionsName, src, dist, configs, callback) => {
   let stream = gulp.src(src);
   actionsName.forEach(function(element) {
     console.log(`执行操作：${element}`);
+    callback(LOGS[element])
+    if (element == 'sprite') {
+      // 精灵图处理函数中单独对 css 和 img 进行了导出操作
+      configs.callback = callback;
+    } 
     stream = FUNCS[element](stream, configs);
   })
   // 精灵图操作 stream 返回 false
   if (stream) {
-    return stream.pipe(gulp.dest(dist));
-  }
+    let watchFilepath = Path.resolve(dist, '*.{jpeg,jpg,png,gif,svg}');
+    stream.pipe(gulp.dest(dist));
+    let watcher = watch(watchFilepath, function () {
+      callback('finished')
+      watcher.close();
+      console.log('watching');
+    });
+  } 
 }
 
 
@@ -339,7 +413,14 @@ var handleIMG = (actionsName, src, dist, configs, callback) => {
   let stream = gulp.src(src);
   actionsName.forEach(function(element) {
     console.log(`执行操作：${element}`);
+    callback(LOGS[element])
     stream = FUNCS[element](stream, configs);
   })
-  return stream.pipe(gulp.dest(dist));
+  let watchFilepath = Path.resolve(dist, '*.*');
+  stream.pipe(gulp.dest(dist));
+  let watcher = watch(watchFilepath, function () {
+    callback('finished')
+    watcher.close();
+    console.log('watching');
+  });
 }
