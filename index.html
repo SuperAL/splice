@@ -28,9 +28,13 @@
             <nav class="nav-group" :class="{'disabled': (!!currentCategory && (category.name !== currentCategory) && (category.name !== '通用') && (currentCategory !== '通用')) || isSolo}">
               <h5 class="nav-group-title" v-cloak>{{ category.name }}</h5>
               <template v-for="(action, aIndex) in category.list">
-                <span class="nav-group-item" :class="{'disabled': action.disabled || (action.isSolo && (currentActions.length > 0))}" @click="addToCurrent(category, action, [cIndex, aIndex])" v-cloak>
-                  <span :class="'icon icon-'+action.icon"></span> {{ action.name }}
+                <span class="item-wrap">
+                  <span class="nav-group-item" :class="{'disabled': action.disabled || (action.isSolo && (currentActions.length > 0))}" @click="addToCurrent(category, action, [cIndex, aIndex])" v-cloak>
+                    <span :class="'icon icon-'+action.icon"></span> {{ action.name }}
+                  </span>
+                  <span v-if="!!action.wiki" class="icon icon-help-circled wiki-link" title="使用说明" @click="openExternal(action.wiki)"></span>
                 </span>
+                
               </template>
             </nav>
           </template>

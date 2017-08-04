@@ -1,5 +1,4 @@
-const { dialog } = require('electron').remote
-
+const { dialog, shell } = require('electron').remote
 
 const categoryFUNCS = {
   'HTML': handleHTML,
@@ -97,7 +96,7 @@ let storedActions = getStore('actions');
 let defaultActions = [{
     name: 'HTML',
     list: [
-      { name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false },{ name: '合并 css / js', funcName: 'usemin', icon: 'light-up', disabled: false, isSolo: true, configs: [
+      { name: '压缩', funcName: 'htmlmin', icon: 'light-up', disabled: false },{ name: '合并 css / js', funcName: 'usemin', icon: 'light-up', disabled: false, isSolo: true, wiki: 'https://github.com/SuperAL/splice/wiki/%E5%90%88%E5%B9%B6-css-js', configs: [
       {
         type: 'custom-checkbox',
         label: '是否压缩合并后的 js',
@@ -337,6 +336,9 @@ var app = new Vue({
     },
     getConfig() {
       console.table(this.currentActions[0].action.configs)
+    },
+    openExternal(link) {
+      shell.openExternal(link);
     }
   }
 })
