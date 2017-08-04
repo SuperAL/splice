@@ -8,14 +8,16 @@
     "start": "electron .",
     "watch": "watchify js/es6.js -t babelify -o js/index.js --debug --verbose",
     "quickexe": "electron-packager .",
-    "package": "electron-packager ./ DemoApps --overwrite --app-version=1.0.0 --platform=win32 --arch=all --out=../DemoApps --version=1.2.1 --icon=./public/img/app-icon.icns"
+    "package": "electron-packager ./ DemoApps --overwrite --app-version=1.0.0 --platform=win32 --arch=all --out=../DemoApps --version=1.2.1 --icon=./public/img/app-icon.icns",
+    "pack:win": "electron-packager ./ Splice --platform=win32 --arch=x64 --overwrite --out=../splice-dist/ --icon=icon/logo.ico --version 1.2.5",
+    "pack:win32": "electron-packager ./ Splice --platform=win32 --arch=ia32 --overwrite --out=../splice-dist/ --icon=icon/logo.ico --version 1.2.5"
   },
   "repository": "https://github.com/SuperAL/splice.git",
   "keywords": [
     "Electron",
     "workflow"
   ],
-  "author": "GitHub",
+  "author": "Alex",
   "license": "CC0-1.0",
   "dependencies": {
     "autoprefixer": "~6.1.2",

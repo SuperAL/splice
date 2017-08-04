@@ -505,7 +505,7 @@ var handleFiles = (filePaths) => {
     element.action.configs.forEach((item, idx) => {
 
       cleanConfigs[item.key] = item.value;
-
+      console.log(item.key, item.value );
 
       // 只要成功获取到文件列表，即代表保存设置生效
       // 判断当前操作 是否存在保存设置属性 及 保存设置是否为 true
@@ -567,6 +567,9 @@ var handleFiles = (filePaths) => {
 
     // 分别处理单个文件
     walk(filepath, function(err, results) {
+      // 克隆配置信息，针对单个文件进行配置信息的再处理
+      let singleConfig = deepClone(configs);
+
       console.log('filepath results', results);
       var fileTypeArr = results.split('.'),
         // 文件类型 fileType:css
@@ -595,15 +598,15 @@ var handleFiles = (filePaths) => {
           let basename = fileName.split('.')[0];
           let re = new RegExp(basename, 'gi');
           let extname = fileName.replace(re, '');
-          configs.basename = !!configs.basename ? configs.basename : basename;
-          configs.extname = !!configs.extname ? configs.extname : extname;
+          singleConfig.basename = !!singleConfig.basename ? singleConfig.basename : basename;
+          singleConfig.extname = !!singleConfig.extname ? singleConfig.extname : extname;
         }
 
         // 判断是否设置了 导出目录，默认导出到当前目录，存在 configs 里面是为了让 spriteIMG 操作可以获取到
-        configs.dest = !!configs.dest ? Path.resolve(fileDir, configs.dest) : fileDir;
+        singleConfig.dest = !!singleConfig.dest ? Path.resolve(fileDir, singleConfig.dest) : fileDir;
         //有文件，直接覆盖；没有文件，新建文件
         app.isLoading = true;
-        handleFUNC(app.currentActionsName, results, configs.dest, configs, function(currentStatus) {
+        handleFUNC(app.currentActionsName, results, singleConfig.dest, singleConfig, function(currentStatus) {
           if (currentStatus == 'finished') {
             app.isLoading = false;
             app.currentStatus = '';
