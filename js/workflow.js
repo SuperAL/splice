@@ -22,7 +22,9 @@ var merge = require('merge-stream');
 var usemin = require('gulp-usemin2');
 var cleanCSS = require('gulp-clean-css');
 
+// for loading 
 var watch = require('gulp-watch');
+var pathExists = require('path-exists');
 
 /**
  * -----------------------------------------------------------------
@@ -184,21 +186,32 @@ var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, is
   // 监听 img 和 css 文件的生成，都生成成功后再停止 loading
   let watchFilepathImg = Path.resolve(imgFinal, '*.{jpeg,jpg,png,gif,svg}');
   let watchFilepathCss = Path.resolve(cssFinal, '*.css');
-  let isImgFin = false, isCssFin = false;
+  let isImgFin = !pathExists.sync(imgFinal), isCssFin = !pathExists.sync(cssFinal);
+
+  // let a = pathExists.sync(imgFinal);  
+  // let b = pathExists.sync(cssFinal);
+
+  // console.log('imgFinal pathExists', a);
+  // console.log('cssFinal pathExists', b);
+
   let watcherImg = watch(watchFilepathImg, function () {
+    console.log('watching:',watchFilepathImg);
     if (isCssFin) {
       callback('finished')
     }
     isImgFin = true;
     watcherImg.close();
   });
+
   let watcherCss = watch(watchFilepathCss, function () {
+    console.log('watching:',watchFilepathCss);
     if (isImgFin) {
       callback('finished')
     }
     isCssFin = true;
     watcherCss.close();
   });
+
   // Return a merged stream to handle both `end` events
   // return merge(imgStream, cssStream);
   return false;

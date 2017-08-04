@@ -250,6 +250,7 @@ var app = new Vue({
     currentCategory: '',
     currentActions: [],
     isLoading: false,
+    loadingMsg: '处理中...',
     currentStatus: '',
     isSolo: false // 当前只有一个操作，不能拼接其他操作
   },
@@ -381,7 +382,16 @@ function dropHandler(el, target, source, sibling) {
 
 $(document).ready(function() {
   // 初始化拖拽排序
-  drake = dragula([document.querySelector('#draggable')]);
+  drake = dragula([document.querySelector('#draggable')],{
+    moves: function (el, source, handle, sibling) {
+      console.log(handle);
+      if (handle.classList && handle.classList.contains('draggable-item')) {
+        return true; 
+      } else {
+        return false;
+      }
+    }
+  });
   // 处理拖拽排序功能
   drake.on('drop', dropHandler);
 
@@ -463,6 +473,7 @@ $(document).ready(function() {
   //     console.log(file.path);  // 原生 input 只能获取文件或者文件夹位置，不能同时获取到
   //   })
   // })
+      
 });
 
 var handleFiles = (filePaths) => {

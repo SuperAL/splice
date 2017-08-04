@@ -83,7 +83,7 @@
     <div id="loading-modal" v-show="isLoading">
       <div class="loading-animation">
         <div class="loading"></div>
-        <div id="loading-text">处理中...</div>
+        <div id="loading-text" v-text="loadingMsg">加载中...</div>
       </div>
       <!-- <span class="loading-log">{{currentStatus}}</span> -->
     </div>
