@@ -320,7 +320,10 @@ var app = new Vue({
       let isLeftCommon = false;
       for (let item of this.currentActions) {
         let category = this.actions[item.index[0]].name;
-        if (category == '通用') {
+        if (category !== '通用') {
+          this.currentCategory = category;
+          break;
+        } else {
           isLeftCommon = true;
         }
       }
