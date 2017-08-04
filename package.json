@@ -36,6 +36,7 @@
     "gulp.spritesmith": "^6.5.1",
     "imagemin-pngquant": "^5.0.1",
     "merge-stream": "^1.0.1",
+    "path-exists": "^3.0.0",
     "vinyl-buffer": "^1.0.0"
   },
   "devDependencies": {
