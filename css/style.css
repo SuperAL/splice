@@ -413,3 +413,61 @@
 .notification-fade-leave-active {
 	opacity: 0
 }
+
+/*scrollbar*/
+::-webkit-scrollbar-track
+{
+	background-color: #fff;
+	border-left: 2px solid transparent;
+}
+
+::-webkit-scrollbar
+{
+	width: 6px;
+	height: 6px;
+	background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb
+{
+	background-color: #ddd;
+	border-left: 2px solid transparent;
+}
+
+/*sprite.css*/
+.icon, .nav-group-item .icon {
+	display: inline-block;
+	margin-top: 3px;
+	vertical-align: top;
+	margin-right: 7px;
+}
+.nav-group-item .icon-css, .icon-css {
+	background-image: url(../icon/sprite.png);
+	background-position: -22px 0px;
+	width: 15px;
+	height: 18px;
+}
+.nav-group-item .icon-html, .icon-html {
+	background-image: url(../icon/sprite.png);
+	background-position: -41px 0px;
+	width: 15px;
+	height: 18px;
+}
+.nav-group-item .icon-img, .icon-img {
+	background-image: url(../icon/sprite.png);
+	background-position: -19px -22px;
+	width: 15px;
+	height: 16px;
+}
+.nav-group-item .icon-js, .icon-js {
+	background-image: url(../icon/sprite.png);
+	background-position: 0px 0px;
+	width: 18px;
+	height: 18px;
+}
+.nav-group-item .icon-reset, .icon-reset {
+	background-image: url(../icon/sprite.png);
+	background-position: 0px -22px;
+	width: 15px;
+	height: 17px;
+}
