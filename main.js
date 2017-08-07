@@ -4,19 +4,19 @@ const app = electron.app
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 const globalShortcut = electron.globalShortcut
-
-require('electron-reload')(__dirname, { ignored: /node_modules|[\/\\]\./ });
-
 const path = require('path')
 const url = require('url')
+
+// 开发时使用：自动更新
+// build: 打包时需注释掉
+require('electron-reload')(__dirname, { ignored: /node_modules|[\/\\]\./ });
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
 function createWindow() {
-
-
   // Create the browser window.
   mainWindow = new BrowserWindow({ minWidth: 800, minHeight: 600 })
 
@@ -31,11 +31,17 @@ function createWindow() {
   mainWindow.setMenu(null);
 
   // Open the DevTools.
+  // build: 打包时需注释掉
   mainWindow.webContents.openDevTools()
 
-  // 刷新页面 快捷键 Ctrl+Alt+R
+  // 快捷键 Ctrl+Alt+R 刷新页面 
   globalShortcut.register('Ctrl+Alt+R', function () {
     mainWindow.webContents.reload();
+  })
+
+  // 快捷键 Ctrl+Alt+T 开启或关闭开发者工具
+  globalShortcut.register('Ctrl+Alt+T', function () {
+    mainWindow.webContents.toggleDevTools();
   })
 
   // Emitted when the window is closed.

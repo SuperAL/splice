@@ -250,6 +250,7 @@ var app = new Vue({
     currentActions: [],
     isLoading: false,
     loadingMsg: '处理中...',
+    isDone: false,
     currentStatus: '',
     isSolo: false // 当前只有一个操作，不能拼接其他操作
   },
@@ -267,6 +268,17 @@ var app = new Vue({
     customRadio,
     customCheckbox
 
+  },
+  watch: {
+    isLoading(newVal) {
+      if (!newVal) {
+        let vm = this;
+        vm.isDone = true;
+        setTimeout(()=>{
+          vm.isDone = false;
+        }, 2000)
+      }
+    }
   },
   methods: {
     addToCurrent(category, action, index) {
