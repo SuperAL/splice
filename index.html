@@ -59,10 +59,10 @@
           </ul>
         </div>
         <div class="pane">
-          <h1 class="title" v-cloak>操作 {{ currentCategory }} 文件</h1>
+          <h1 class="title current-tips" v-cloak>操作 {{ currentCategory }} 文件</h1>
           <!-- todo:  拖拽排序-->
-          <p>当前操作：
-            <span v-for="(action, index) in currentActions" v-cloak>{{ action.action.name + ((currentActions.length !== (index+1))?" > ":"")}}</span>
+          <p class="current-actions">您要执行的操作是：
+            <span v-for="(action, index) in currentActions" v-cloak>{{ action.action.name + ((currentActions.length !== (index+1))?" + ":"")}}</span>
           </p>
           <p class="desc">＊用法：拖拽CSS文件到下面的线框中，会自动生成名字'-result'的结果css，支持多个文件。
           </p>
@@ -91,6 +91,9 @@
       </div>
       <!-- <span class="loading-log">{{currentStatus}}</span> -->
     </div>
+    <transition name="notification-fade">
+    <div v-show="isDone" class="notification" style="top: 16px; z-index: 2002;"><div class="notification__group notification__notitle"><h2 class="notification__title" style="display: none;">提示</h2><div class="notification__content">处理成功</div><div class="notification__closeBtn icon-close"></div></div></div>
+    </transition>
   </div>
   <script type="text/javascript" src="./js/jquery-1.8.2.js"></script>
   <script type="text/javascript" src="./js/vue.js"></script>
