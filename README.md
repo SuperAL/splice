@@ -20,7 +20,7 @@ GUI workflow for Front-End developers based on Electron
 		- 设置文件的导出目录
 
 ### 其他：
-- 快捷键:
+- 快捷键：
 	- 刷新页面：Ctrl+Alt+R
 	- 开启或关闭开发者工具: Ctrl+Alt+T
 
