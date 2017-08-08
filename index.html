@@ -96,7 +96,7 @@
       <!-- <span class="loading-log">{{currentStatus}}</span> -->
     </div>
     <transition name="notification-fade">
-    <div v-show="isDone" class="notification" style="top: 16px; z-index: 2002;"><div class="notification__group notification__notitle"><h2 class="notification__title" style="display: none;">提示</h2><div class="notification__content">处理成功</div><div class="notification__closeBtn icon-close"></div></div></div>
+    <div v-show="isDone" class="notification" style="top: 16px; z-index: 9;" :style="{opacity: 1}"><div class="notification__group notification__notitle"><h2 class="notification__title" style="display: none;">提示</h2><div class="notification__content">处理成功</div><div class="notification__closeBtn icon-close"></div></div></div>
     </transition>
   </div>
   <script type="text/javascript" src="./js/jquery-1.8.2.js"></script>

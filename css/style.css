@@ -331,7 +331,8 @@
 	background-color: #fff;
 	box-shadow: 0 2px 4px rgba(0,0,0,.12),0 0 6px rgba(0,0,0,.04);
 	transition: opacity .3s,transform .3s,right .3s,top .4s;
-	overflow: hidden
+	overflow: hidden;
+	opacity: 0;
 }
 
 .notification .icon-circle-check {
