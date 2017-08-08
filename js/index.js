@@ -88,7 +88,7 @@ let defaultActions = [{
                 icon: 'html',
                 disabled: false,
                 isSolo: true,
-                wiki: 'https://github.com/SuperAL/splice/wiki/%E5%90%88%E5%B9%B6-css-js',
+                wiki: 'https://www.zybuluo.com/alexlee/note/841903',
                 configs: [{
                         type: 'custom-checkbox',
                         label: '是否压缩合并后的 js',
@@ -247,7 +247,6 @@ var app = new Vue({
         actions: deepClone(storedActions ? storedActions : defaultActions),
         currentCategory: '',
         currentActions: [],
-        isVueLoading: true,
         isLoading: false,
         loadingMsg: '处理中...',
         isDone: false,
@@ -271,10 +270,6 @@ var app = new Vue({
     },
     watch: {
         isLoading(newVal) {
-          if (this.isVueLoading) {
-            this.isVueLoading = false;
-            return;
-          }
           if (!newVal) {
               let vm = this;
               vm.isDone = true;
