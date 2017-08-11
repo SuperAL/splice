@@ -26,7 +26,8 @@ GUI workflow for Front-End developers based on Electron
 
 # 截图
 ### 界面：
-![GUI](./images/GUI.png)
+![WIN](./images/GUI.png)
+![MAC](./images/GUI-mac.png)
 
 ### 简单操作：
 ![压缩并重命名图片](./images/splice-demo1.gif)
