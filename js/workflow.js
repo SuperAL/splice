@@ -184,8 +184,10 @@ var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, is
   .pipe(gulp.dest(cssFinal));
 
   // 监听 img 和 css 文件的生成，都生成成功后再停止 loading
-  let watchFilepathImg = Path.resolve(imgFinal, '*.{jpeg,jpg,png,gif,svg}');
-  let watchFilepathCss = Path.resolve(cssFinal, '*.css');
+  // let watchFilepathImg = Path.resolve(imgFinal, '*.{jpeg,jpg,png,gif,svg,JPEG,JPG,PNG,GIF,SVG}');
+  let watchFilepathImg = Path.resolve(imgFinal, '*.*');
+  // let watchFilepathCss = Path.resolve(cssFinal, '*.css');
+  let watchFilepathCss = Path.resolve(cssFinal, '*.*');
   let isImgFin = !pathExists.sync(imgFinal), isCssFin = !pathExists.sync(cssFinal);
 
   // let a = pathExists.sync(imgFinal);  
@@ -310,7 +312,8 @@ var handleHTML = (actionsName, src, dist, configs, callback) => {
     callback(LOGS[element])
     stream = FUNCS[element](stream, configs);
   })
-  let watchFilepath = Path.resolve(dist, '*.html');
+  // let watchFilepath = Path.resolve(dist, '*.html');
+  let watchFilepath = Path.resolve(dist, '*.*');
   stream.pipe(gulp.dest(dist));
   let watcher = watch(watchFilepath, function () {
     callback('finished')
@@ -340,7 +343,8 @@ var handleCSS = (actionsName, src, dist, configs, callback) => {
     callback(LOGS[element])
     stream = FUNCS[element](stream, configs);
   })
-  let watchFilepath = Path.resolve(dist, '*.css');
+  // let watchFilepath = Path.resolve(dist, '*.css');
+  let watchFilepath = Path.resolve(dist, '*.*');
   stream.pipe(gulp.dest(dist));
   let watcher = watch(watchFilepath, function () {
     callback('finished')
@@ -367,7 +371,8 @@ var handleJS = (actionsName, src, dist, configs, callback) => {
     callback(LOGS[element])
       stream = FUNCS[element](stream, configs);
   })
-  let watchFilepath = Path.resolve(dist, '*.js');
+  // let watchFilepath = Path.resolve(dist, '*.js');
+  let watchFilepath = Path.resolve(dist, '*.*');
   stream.pipe(gulp.dest(dist));
   let watcher = watch(watchFilepath, function () {
     callback('finished')
@@ -400,7 +405,8 @@ var handleIMG = (actionsName, src, dist, configs, callback) => {
   })
   // 精灵图操作 stream 返回 false
   if (stream) {
-    let watchFilepath = Path.resolve(dist, '*.{jpeg,jpg,png,gif,svg}');
+    // let watchFilepath = Path.resolve(dist, '*.{jpeg,jpg,png,gif,svg}');
+    let watchFilepath = Path.resolve(dist, '*.*');
     stream.pipe(gulp.dest(dist));
     let watcher = watch(watchFilepath, function () {
       callback('finished')

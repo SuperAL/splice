@@ -630,7 +630,7 @@ var handleFileType = (fileType) => {
         console.log(`type: ${currentTypes.join('/')}`);
 
         // 只要处理的文件有格式不对的，都会提示
-        if (currentTypes.indexOf(fileType) == -1) {
+        if (currentTypes.indexOf(fileType.toLowerCase()) == -1) {
             alert(`请拖进 ${currentTypes.join('/')} 文件～`);
         } else {
             return true;
