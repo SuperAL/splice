@@ -14,7 +14,11 @@ GUI workflow for Front-End developers based on Electron
 4. IMAGE：
 	- 压缩图片
 	- 将多张图片合成精灵图并生成相应的 css
-5. 通用：
+5. JSON：
+	- 压缩 json
+6. 通用：
+	- 格式化
+		- 格式化 JavaScript, JSON, HTML 和 CSS 等文件
 	- 文件重命名
 	- 自定义设置
 		- 设置文件的导出目录

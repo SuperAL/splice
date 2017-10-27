@@ -10,6 +10,9 @@ var uglify = require("gulp-uglify");
 var htmlmin = require('gulp-htmlmin');
 var prettify = require('gulp-jsbeautifier');
 
+// 通过 css 生成精灵图
+var spriter = require('gulp-sprite-generator2');
+
 // json 文件处理
 var jsonMinify = require('gulp-json-minify');
 
@@ -82,7 +85,7 @@ var useminHTML = (stream, {isUglify, isRev}) => {
  * @return {gulp stream}   stream     
  */
 var prefixCSS = (stream) => {
-  return stream.pipe(postcss([autoprefixer({ browsers: ['last 4 versions'] })]));
+  return stream.pipe(postcss([autoprefixer()]));
 }
 
 /**
@@ -101,6 +104,96 @@ var compressCSS = (stream) => {
     keepSpecialComments: 0
   }));
 }
+
+// var spriteCSS = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, isCssMin, cssDest, callback}) => {
+//   var spriteOutput;
+//   spriteOutput = stream
+//       .pipe(spriter({
+//           baseUrl: "./",
+//           spriteSheetName: "[name].sprite.png", // 会自动把 [name] 替换成正在处理文件名
+//           spriteSheetPath: imgPath,
+//           filter: [
+//               function(image) {
+//                 return re.test(str)
+//                   return !(image.url.indexOf("?__sprite") === -1); // 只对 ?__sprite 进行雪碧图合并
+//               }
+//           ]
+//           verbose: true
+//       }))
+
+//   spriteOutput.css.pipe(gulp.dest(distPath + '/css'));
+//   spriteOutput.img.pipe(gulp.dest(distPath + '/images/sprite'));
+//   // Generate our spritesheet
+//   var spriteData = stream.pipe(spritesmith({
+//     imgName: imgName,
+//     cssName: cssName,
+//     imgPath: imgPath,
+//     padding: 4
+//   }));
+//   let imgFinal = Path.resolve(dest, imgDest);
+//   let cssFinal = Path.resolve(dest, cssDest);
+//   // Pipe image stream through image optimizer and onto disk
+//   var imgStream = spriteData.img
+//     // DEV: We must buffer our stream into a Buffer for `imagemin`
+//     .pipe(buffer())
+//     .pipe(gulpif(isImgMin, imagemin([
+//       imagemin.gifsicle({ interlaced: true }),
+//       imagemin.jpegtran({ progressive: true }),
+//     // imagemin.optipng({ optimizationLevel: 5 }),
+//     imagemin.svgo({ plugins: [{ removeViewBox: true }] }),
+//     pngquant()
+//     ])))
+//     .pipe(gulp.dest(imgFinal));
+
+//   // Pipe CSS stream through CSS optimizer and onto disk
+//   var cssStream = spriteData.css
+//   .pipe(gulpif(isCssMin, minifyCSS({
+//     safe: true,
+//     reduceTransforms: false,
+//     advanced: false,
+//     compatibility: 'ie7',
+//     keepSpecialComments: 0
+//   })))
+//   .pipe(gulp.dest(cssFinal));
+
+//   // 监听 img 和 css 文件的生成，都生成成功后再停止 loading
+//   // let watchFilepathImg = Path.resolve(imgFinal, '*.{jpeg,jpg,png,gif,svg,JPEG,JPG,PNG,GIF,SVG}');
+//   let watchFilepathImg = Path.resolve(imgFinal, '*.*');
+//   // let watchFilepathCss = Path.resolve(cssFinal, '*.css');
+//   let watchFilepathCss = Path.resolve(cssFinal, '*.*');
+//   let isImgFin = !pathExists.sync(imgFinal), isCssFin = !pathExists.sync(cssFinal);
+
+//   // let a = pathExists.sync(imgFinal);
+//   // let b = pathExists.sync(cssFinal);
+
+//   // console.log('imgFinal pathExists', a);
+//   // console.log('cssFinal pathExists', b);
+
+//   let watcherImg = watch(watchFilepathImg, function () {
+//     console.log('watching:',watchFilepathImg);
+//     if (isCssFin) {
+//       callback('finished')
+//     }
+//     isImgFin = true;
+//     watcherImg.close();
+//   });
+
+//   let watcherCss = watch(watchFilepathCss, function () {
+//     console.log('watching:',watchFilepathCss);
+//     if (isImgFin) {
+//       callback('finished')
+//     }
+//     isCssFin = true;
+//     watcherCss.close();
+//   });
+
+//   // Return a merged stream to handle both `end` events
+//   // return merge(imgStream, cssStream);
+//   return false;
+// }
+
+
+
 
 /**
  * -----------------------------------------------------------------
