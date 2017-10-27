@@ -9,7 +9,7 @@ const url = require('url')
 
 // 开发时使用：自动更新
 // build: 打包时需注释掉
-// require('electron-reload')(__dirname, { ignored: /node_modules|[\/\\]\./ });
+require('electron-reload')(__dirname, { ignored: /node_modules|[\/\\]\./ });
 
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -18,7 +18,7 @@ let mainWindow
 
 function createWindow() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({ width: 1000, height: 650, minWidth: 1000, minHeight: 650 })
+  mainWindow = new BrowserWindow({ width: 1000, height: 730, minWidth: 1000, minHeight: 730 })
 
   // and load the index.html of the app.
   mainWindow.loadURL(url.format({
