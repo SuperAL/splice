@@ -8,6 +8,10 @@ var rename = require('gulp-rename');
 var autoprefixer = require('autoprefixer');
 var uglify = require("gulp-uglify");
 var htmlmin = require('gulp-htmlmin');
+var prettify = require('gulp-jsbeautifier');
+
+// json 文件处理
+var jsonMinify = require('gulp-json-minify');
 
 // 图片压缩
 var imagemin = require('gulp-imagemin');
@@ -224,6 +228,25 @@ var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, is
 
 /**
  * -----------------------------------------------------------------
+ * JSON 文件相关操作
+ * -----------------------------------------------------------------
+ */
+/**
+ * gulp-json-minify - 压缩 json 文件
+ * @author Alexee
+ * @date   2017-10-26
+ * @param  {gulp stream}   stream
+ * @return {gulp stream}   stream
+ */
+var minifyJSON = (stream) => {
+  return stream.pipe(jsonMinify())
+}
+
+
+
+
+/**
+ * -----------------------------------------------------------------
  * 通用操作
  * -----------------------------------------------------------------
  */
@@ -259,6 +282,39 @@ var doNothing = (stream) => {
   return stream;
 }
 
+/**
+ * gulp-jsbeautifier - Prettify JavaScript, JSON, HTML and CSS.
+ * Default value for css: ['.css', '.less', '.sass', '.scss']
+ * Default value for html: ['.html']
+ * Default value for js: ['.js', '.json']
+ * @author Alexee
+ * @date   2017-10-26
+ * @param  {gulp stream}        stream
+ * @param  {Number or String}   space 缩进空格
+ * @return {gulp stream}        stream
+ */
+ var prettifyALL = (stream, {indent = 4, js = [], css = [], html = []}) => {
+  // let {indent = 4, js = [], css = [], html = []} = configs;
+  [js, css, html] = [js, css, html].map(item => {
+    return item.map(suffix => {
+      return '.' + suffix;
+    })
+  })
+  return stream.pipe(prettify({
+    indent_size: indent,
+    js: {
+      file_types: ['.js', '.json', ...js]
+    },
+    css: {
+      file_types: ['.css', '.less', '.sass', '.scss', ...css]
+    },
+    html: {
+      file_types: ['.html', ...html]
+    }
+  }))
+}
+
+
 
 
 const FUNCS = {
@@ -273,6 +329,9 @@ const FUNCS = {
   // image
   'imagemin': imageminIMG,
   'sprite': spriteIMG,
+  // json
+  'minify': minifyJSON,
+  'format': prettifyALL,
   // common
   'rename': renameALL,
   'dest': doNothing
@@ -289,97 +348,14 @@ const LOGS = {
   // image
   'imagemin': '压缩图片',
   'sprite': '合并生成精灵图',
+  // json
+  'minify': '压缩 json',
   // common
+  'format': '格式化',
   'rename': '文件重命名',
   'dest': '设置导出目录'
 }
-/**
- * 处理 html 文件
- * @author Alexee
- * @date   2017-07-22
- * @param  {array}   actionsName  [需要执行的操作]
- * @param  {string}   src         [处理的文件地址]
- * @param  {string}   dist        [文件导出地址]
- * @param  {object}   configs     [操作设置]
- * @param  {Function} callback    [文件处理完的回调函数]
- * @return {[type]}               [description]
- */
-var handleHTML = (actionsName, src, dist, configs, callback) => {
-  console.log(actionsName, src, dist, configs, callback);
-  let stream = gulp.src(src);
-  actionsName.forEach(function(element) {
-    console.log(`执行操作：${element}`);
-    callback(LOGS[element])
-    stream = FUNCS[element](stream, configs);
-  })
-  // let watchFilepath = Path.resolve(dist, '*.html');
-  let watchFilepath = Path.resolve(dist, '*.*');
-  stream.pipe(gulp.dest(dist));
-  let watcher = watch(watchFilepath, function () {
-    callback('finished')
-    watcher.close();
-    console.log('watching');
-  });
-}
 
-
-
-/**
- * 处理 css 文件
- * @author Alexee
- * @date   2017-07-22
- * @param  {array}   actionsName  [需要执行的操作]
- * @param  {string}   src         [处理的文件地址]
- * @param  {string}   dist        [文件导出地址]
- * @param  {string}   configs     [操作设置]
- * @param  {Function} callback    [文件处理完的回调函数]
- * @return {[type]}               [description]
- */
-var handleCSS = (actionsName, src, dist, configs, callback) => {
-  console.log(actionsName, src, dist, configs, callback);
-  let stream = gulp.src(src);
-  actionsName.forEach(function(element) {
-    console.log(`执行操作：${element}`);
-    callback(LOGS[element])
-    stream = FUNCS[element](stream, configs);
-  })
-  // let watchFilepath = Path.resolve(dist, '*.css');
-  let watchFilepath = Path.resolve(dist, '*.*');
-  stream.pipe(gulp.dest(dist));
-  let watcher = watch(watchFilepath, function () {
-    callback('finished')
-    watcher.close();
-    console.log('watching');
-  });
-}
-
-/**
- * 处理 js 文件
- * @author Alexee
- * @date   2017-07-22
- * @param  {array}   actionsName  [需要执行的操作]
- * @param  {string}   src         [处理的文件地址]
- * @param  {string}   dist        [文件导出地址]
- * @param  {string}   configs     [操作设置]
- * @param  {Function} callback    [文件处理完的回调函数]
- * @return {[type]}               [description]
- */
-var handleJS = (actionsName, src, dist, configs, callback) => {
-  let stream = gulp.src(src);
-  actionsName.forEach(function(element) {
-    console.log(`执行操作：${element}`);
-    callback(LOGS[element])
-      stream = FUNCS[element](stream, configs);
-  })
-  // let watchFilepath = Path.resolve(dist, '*.js');
-  let watchFilepath = Path.resolve(dist, '*.*');
-  stream.pipe(gulp.dest(dist));
-  let watcher = watch(watchFilepath, function () {
-    callback('finished')
-    watcher.close();
-    console.log('watching');
-  });
-}
 
 /**
  * 处理 image 文件

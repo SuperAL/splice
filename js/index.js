@@ -1,11 +1,13 @@
 const { dialog, shell } = require('electron').remote
+const objectMerge = require('object-merge');
 
 // 方法名对照
 const categoryFUNCS = {
-    'HTML': handleHTML,
-    'CSS': handleCSS,
-    'JS': handleJS,
+    'HTML': handleALL,
+    'CSS': handleALL,
+    'JS': handleALL,
     'IMAGE': handleIMG,
+    'JSON': handleALL,
     '通用': handleALL
 }
 
@@ -79,7 +81,8 @@ var customCheckbox = {
 }
 
 let storedActions = getStore('actions');
-let defaultActions = [{
+let defaultActions = [
+    {
         name: 'HTML',
         list: [
             { name: '压缩', funcName: 'htmlmin', icon: 'html', disabled: false }, {
@@ -174,9 +177,45 @@ let defaultActions = [{
             }
         ]
     },
+    { name: 'JSON', list: [{ name: '压缩', funcName: 'minify', icon: 'js', disabled: false }] },
     {
         name: '通用',
         list: [{
+            name: '格式化',
+            funcName: 'format',
+            icon: 'reset',
+            disabled: false,
+            configs: [{
+                type: 'custom-input',
+                label: '缩进',
+                key: 'indent',
+                value: '', // 默认缩进：4
+                placeholder: "默认缩进：4"
+            }, {
+                type: 'custom-input',
+                label: 'JS',
+                key: 'js',
+                value: '', // 默认后缀：'.js', '.json'
+                placeholder: "默认:js,json,可新增,逗号隔开"
+            }, {
+                type: 'custom-input',
+                label: 'CSS',
+                key: 'css',
+                value: '', // 默认后缀：'.css', '.less', '.sass', '.scss'
+                placeholder: "默认:css,less,sass,scss"
+            }, {
+                type: 'custom-input',
+                label: 'HTML',
+                key: 'html',
+                value: '',
+                placeholder: "默认:html"
+            }, {
+                type: 'custom-checkbox',
+                label: '是否保存设置',
+                key: 'isSaved',
+                value: false
+            }]
+        }, {
             name: '重命名',
             funcName: 'rename',
             icon: 'reset',
@@ -244,14 +283,18 @@ let defaultActions = [{
 var app = new Vue({
     el: '#app',
     data: {
-        actions: deepClone(storedActions ? storedActions : defaultActions),
+        actions: storedActions ? objectMerge(defaultActions, storedActions) : defaultActions,
         currentCategory: '',
         currentActions: [],
         isLoading: false,
         loadingMsg: '处理中...',
         isDone: false,
+        message: '处理成功',
+        clear: null, // clear setTimeout
         currentStatus: '',
-        isSolo: false // 当前只有一个操作，不能拼接其他操作
+        isSolo: false, // 当前只有一个操作，不能拼接其他操作
+
+        file_types: [] // 全局存放 格式化操作 新增的文件后缀
     },
     computed: {
         currentActionsName() {
@@ -270,13 +313,18 @@ var app = new Vue({
     },
     watch: {
         isLoading(newVal) {
-          if (!newVal) {
-              let vm = this;
-              vm.isDone = true;
-              setTimeout(() => {
-                  vm.isDone = false;
-              }, 2000)
-          }
+            if (!newVal) {
+                let vm = this;
+                vm.message = '处理成功';
+                if (vm.isDone) {
+                    clearTimeout(vm.clear);
+                } else {
+                    vm.isDone = true;
+                }
+                vm.clear = setTimeout(() => {
+                    vm.isDone = false;
+                }, 2000)
+            }
         }
     },
     methods: {
@@ -478,11 +526,23 @@ var handleFiles = (filePaths) => {
     let savedConfigs = [];
     // 存储一次文件处理的所有配置信息
     let configs = {};
+    app.file_types = []; // 清空 格式化操作 的新增文件后缀信息
     app.currentActions.forEach(function(element, index) {
         if (!element.action.configs) { return; }
         let cleanConfigs = {};
         element.action.configs.forEach((item, idx) => {
-            cleanConfigs[item.key] = item.value;
+            // 收集 格式化操作 的新增文件后缀信息
+            if (['js', 'css', 'html'].indexOf(item.key) !== -1) {
+                if (item.value.trim()) {
+                    app.file_types.concat(item.value.replace(' ', '').split(/[,，]/g));
+                    cleanConfigs[item.key] = item.value;
+                }
+                // 如果没值，就不传进 configs 里，这样解构对象时就不会报错了
+                // Uncaught TypeError: Cannot match against 'undefined' or 'null'.
+            } else {
+                cleanConfigs[item.key] = item.value;
+            }
+
 
             // 只要成功获取到文件列表，即代表保存设置生效
             // 判断当前操作 是否存在保存设置属性 及 保存设置是否为 true
@@ -492,6 +552,7 @@ var handleFiles = (filePaths) => {
             }
         })
         Object.assign(configs, cleanConfigs);
+        console.log('configs', configs);
     })
 
     // 更新操作数据 及 localStorage 数据
@@ -544,7 +605,7 @@ var handleFiles = (filePaths) => {
             let singleConfig = deepClone(configs);
 
             var fileTypeArr = results.split('.'),
-                // 文件类型 fileType:css
+                // 文件类型 fileType: css
                 fileType = fileTypeArr[fileTypeArr.length - 1],
                 fileNameArr = results.split("\\"),
                 // 文件名 fileName: test.css
@@ -617,11 +678,35 @@ var handleFileType = (fileType) => {
         'CSS': ['css'],
         'JS': ['js'],
         'HTML': ['html'],
-        'IMAGE': ['png', 'jpg', 'jpeg', 'gif', 'svg']
+        'IMAGE': ['png', 'jpg', 'jpeg', 'gif', 'svg'],
+        'JSON': ['json'],
+        'format': ['js', 'json', 'css', 'less', 'sass', 'scss', 'html']
     }
 
     // 获取当前文件处理类型
     let currentCategory = app.currentCategory;
+    // 获取当前文件处理方法名数组
+    let funcNames = app.currentActionsName;
+
+    // 提示 格式化操作 的文件后缀不支持
+    if (funcNames.indexOf('format') !== -1) {
+        let currentTypes = typeOptions['format'].concat(app.file_types);
+        // 只要处理的文件有格式不对的，都会提示
+        if (currentTypes.indexOf(fileType.toLowerCase()) == -1) {
+            app.message = `格式化操作支持文件后缀： 
+                        ${currentTypes.join(' / ')}`;
+            if (app.isDone) {
+                clearTimeout(app.clear);
+            } else {
+                app.isDone = true;
+            }
+            app.clear = setTimeout(() => {
+                app.isDone = false;
+            }, 2000)
+        } else {
+            return true;
+        }
+    }
 
     if (currentCategory !== '通用') {
         // 获取当前可处理的文件的类型
@@ -631,7 +716,7 @@ var handleFileType = (fileType) => {
 
         // 只要处理的文件有格式不对的，都会提示
         if (currentTypes.indexOf(fileType.toLowerCase()) == -1) {
-            alert(`请拖进 ${currentTypes.join('/')} 文件～`);
+            alert(`请拖进 ${currentTypes.join(' / ')} 文件～`);
         } else {
             return true;
         }

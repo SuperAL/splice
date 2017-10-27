@@ -25,6 +25,8 @@
     "gulp-htmlmin": "^3.0.0",
     "gulp-if": "^2.0.2",
     "gulp-imagemin": "^3.3.0",
+    "gulp-jsbeautifier": "^2.1.1",
+    "gulp-json-minify": "^1.2.0",
     "gulp-postcss": "~6.0.1",
     "gulp-rename": "^1.2.2",
     "gulp-rev": "^8.0.0",
@@ -35,6 +37,7 @@
     "gulp.spritesmith": "^6.5.1",
     "imagemin-pngquant": "^5.0.1",
     "merge-stream": "^1.0.1",
+    "object-merge": "^2.5.1",
     "path-exists": "^3.0.0",
     "vinyl-buffer": "^1.0.0"
   },
