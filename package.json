@@ -17,7 +17,7 @@
   "author": "Alex",
   "license": "CC0-1.0",
   "dependencies": {
-    "autoprefixer": "~6.1.2",
+    "autoprefixer": "^7.1.6",
     "dragula": "^3.7.2",
     "gulp": "~3.9.0",
     "gulp-clean-css": "^3.7.0",
@@ -27,9 +27,10 @@
     "gulp-imagemin": "^3.3.0",
     "gulp-jsbeautifier": "^2.1.1",
     "gulp-json-minify": "^1.2.0",
-    "gulp-postcss": "~6.0.1",
+    "gulp-postcss": "^7.0.0",
     "gulp-rename": "^1.2.2",
     "gulp-rev": "^8.0.0",
+    "gulp-sprite-generator2": "^1.0.4",
     "gulp-uglify": "^3.0.0",
     "gulp-usemin": "^0.3.28",
     "gulp-usemin2": "^0.2.4",
@@ -45,5 +46,10 @@
     "electron": "^1.6.11",
     "electron-packager": "^8.7.2",
     "electron-reload": "^1.2.1"
-  }
+  },
+  "browserslist": [
+    "> 0.5%",
+    "last 10 versions",
+    "not ie <= 8"
+  ]
 }
