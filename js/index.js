@@ -4,7 +4,7 @@ const objectMerge = require('object-merge');
 // 方法名对照
 const categoryFUNCS = {
     'HTML': handleALL,
-    'CSS': handleALL,
+    'CSS': handleIMG,
     'JS': handleALL,
     'IMAGE': handleIMG,
     'JSON': handleALL,
@@ -113,7 +113,70 @@ let defaultActions = [
             }
         ]
     },
-    { name: 'CSS', list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'css', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'css', disabled: false }] },
+    { name: 'CSS', list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'css', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'css', disabled: false }, {
+        name: '精灵图',
+        funcName: 'spriter',
+        icon: 'css',
+        disabled: false,
+        isSolo: true,
+        wiki: 'https://www.zybuluo.com/alexlee/note/932749',
+        configs: [{
+            type: 'custom-input',
+            label: '正则筛选想要处理的图片路径',
+            key: 'pattern',
+            value: '',
+            placeholder: '例：png'
+        },{
+            type: 'custom-input',
+            label: '精灵图文件名',
+            key: 'imgName',
+            value: '',
+            placeholder: '默认：css文件名.sprite.png'
+        },
+        {
+            type: 'custom-input',
+            label: 'css文件名',
+            key: 'cssName',
+            value: 'style.css'
+        },
+        {
+            type: 'custom-input',
+            label: '生成的css中图片相对地址',
+            key: 'imgPath',
+            value: '../image'
+        },
+        {
+            type: 'custom-input',
+            label: '精灵图导出地址',
+            key: 'imgDest',
+            value: './dist/image'
+        },
+        {
+            type: 'custom-input',
+            label: 'css导出地址',
+            key: 'cssDest',
+            value: './dist/css'
+        },
+        {
+            type: 'custom-checkbox',
+            label: '是否压缩精灵图',
+            key: 'isImgMin',
+            value: true
+        },
+        {
+            type: 'custom-checkbox',
+            label: '是否压缩css',
+            key: 'isCssMin',
+            value: false
+        },
+        {
+            type: 'custom-checkbox',
+            label: '是否保存设置',
+            key: 'isSaved',
+            value: false
+        }
+        ]
+    }] },
     { name: 'JS', list: [{ name: '压缩', funcName: 'uglify', icon: 'js', disabled: false }] },
     {
         name: 'IMAGE',
@@ -139,7 +202,7 @@ let defaultActions = [
                     },
                     {
                         type: 'custom-input',
-                        label: 'css中引用的图片地址',
+                        label: '生成的css中引用的图片地址',
                         key: 'imgPath',
                         value: 'sprite.png'
                     },
@@ -177,7 +240,7 @@ let defaultActions = [
             }
         ]
     },
-    { name: 'JSON', list: [{ name: '压缩', funcName: 'minify', icon: 'js', disabled: false }] },
+    { name: 'JSON', list: [{ name: '压缩', funcName: 'minify', icon: 'json', disabled: false }] },
     {
         name: '通用',
         list: [{
