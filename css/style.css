@@ -444,19 +444,19 @@
 }
 .nav-group-item .icon-css, .icon-css {
 	background-image: url(../icon/sprite.png);
-	background-position: -22px 0px;
+	background-position: 0px -22px;
 	width: 15px;
 	height: 18px;
 }
 .nav-group-item .icon-html, .icon-html {
 	background-image: url(../icon/sprite.png);
-	background-position: -41px 0px;
+	background-position: -19px -22px;
 	width: 15px;
 	height: 18px;
 }
 .nav-group-item .icon-img, .icon-img {
 	background-image: url(../icon/sprite.png);
-	background-position: -19px -22px;
+	background-position: -44px -21px;
 	width: 15px;
 	height: 16px;
 }
@@ -466,9 +466,15 @@
 	width: 18px;
 	height: 18px;
 }
+.nav-group-item .icon-json, .icon-json {
+	background-image: url(../icon/sprite.png);
+	background-position: -22px 0px;
+	width: 18px;
+	height: 18px;
+}
 .nav-group-item .icon-reset, .icon-reset {
 	background-image: url(../icon/sprite.png);
-	background-position: 0px -22px;
+	background-position: -44px 0px;
 	width: 15px;
 	height: 17px;
 }

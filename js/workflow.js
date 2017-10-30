@@ -105,92 +105,78 @@ var compressCSS = (stream) => {
   }));
 }
 
-// var spriteCSS = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, isCssMin, cssDest, callback}) => {
-//   var spriteOutput;
-//   spriteOutput = stream
-//       .pipe(spriter({
-//           baseUrl: "./",
-//           spriteSheetName: "[name].sprite.png", // 会自动把 [name] 替换成正在处理文件名
-//           spriteSheetPath: imgPath,
-//           filter: [
-//               function(image) {
-//                 return re.test(str)
-//                   return !(image.url.indexOf("?__sprite") === -1); // 只对 ?__sprite 进行雪碧图合并
-//               }
-//           ]
-//           verbose: true
-//       }))
+var spriteCSS = (stream, {dest, pattern, imgName, cssName, imgPath, isImgMin, imgDest, isCssMin, cssDest, callback}) => {
+  let reg = new RegExp(pattern);
+  var spriteOutput;
+  spriteOutput = stream
+      .pipe(spriter({
+          baseUrl: "./",
+          spriteSheetName: imgName.trim() ? imgName : "[name].sprite.png", // 会自动把 [name] 替换成正在处理文件名
+          styleSheetName: cssName,
+          spriteSheetPath: imgPath,
+          filter: [
+              function(image) {
+                return reg.test(image.url) // 只对名称符合正则的图片进行雪碧图合并
+              }
+          ]
+      }))
 
-//   spriteOutput.css.pipe(gulp.dest(distPath + '/css'));
-//   spriteOutput.img.pipe(gulp.dest(distPath + '/images/sprite'));
-//   // Generate our spritesheet
-//   var spriteData = stream.pipe(spritesmith({
-//     imgName: imgName,
-//     cssName: cssName,
-//     imgPath: imgPath,
-//     padding: 4
-//   }));
-//   let imgFinal = Path.resolve(dest, imgDest);
-//   let cssFinal = Path.resolve(dest, cssDest);
-//   // Pipe image stream through image optimizer and onto disk
-//   var imgStream = spriteData.img
-//     // DEV: We must buffer our stream into a Buffer for `imagemin`
-//     .pipe(buffer())
-//     .pipe(gulpif(isImgMin, imagemin([
-//       imagemin.gifsicle({ interlaced: true }),
-//       imagemin.jpegtran({ progressive: true }),
-//     // imagemin.optipng({ optimizationLevel: 5 }),
-//     imagemin.svgo({ plugins: [{ removeViewBox: true }] }),
-//     pngquant()
-//     ])))
-//     .pipe(gulp.dest(imgFinal));
+  let imgFinal = Path.resolve(dest, imgDest);
+  let cssFinal = Path.resolve(dest, cssDest);
 
-//   // Pipe CSS stream through CSS optimizer and onto disk
-//   var cssStream = spriteData.css
-//   .pipe(gulpif(isCssMin, minifyCSS({
-//     safe: true,
-//     reduceTransforms: false,
-//     advanced: false,
-//     compatibility: 'ie7',
-//     keepSpecialComments: 0
-//   })))
-//   .pipe(gulp.dest(cssFinal));
+  // Pipe image stream through image optimizer and onto disk
+  var imgStream = spriteOutput.img
+    // DEV: We must buffer our stream into a Buffer for `imagemin`
+    .pipe(buffer())
+    .pipe(gulpif(isImgMin, imagemin([
+      imagemin.gifsicle({ interlaced: true }),
+      imagemin.jpegtran({ progressive: true }),
+    // imagemin.optipng({ optimizationLevel: 5 }),
+    imagemin.svgo({ plugins: [{ removeViewBox: true }] }),
+    pngquant()
+    ])))
+    .pipe(gulp.dest(imgFinal));
 
-//   // 监听 img 和 css 文件的生成，都生成成功后再停止 loading
-//   // let watchFilepathImg = Path.resolve(imgFinal, '*.{jpeg,jpg,png,gif,svg,JPEG,JPG,PNG,GIF,SVG}');
-//   let watchFilepathImg = Path.resolve(imgFinal, '*.*');
-//   // let watchFilepathCss = Path.resolve(cssFinal, '*.css');
-//   let watchFilepathCss = Path.resolve(cssFinal, '*.*');
-//   let isImgFin = !pathExists.sync(imgFinal), isCssFin = !pathExists.sync(cssFinal);
+  // Pipe CSS stream through CSS optimizer and onto disk
+  var cssStream = spriteOutput.css
+  .pipe(gulpif(isCssMin, minifyCSS({
+    safe: true,
+    reduceTransforms: false,
+    advanced: false,
+    compatibility: 'ie7',
+    keepSpecialComments: 0
+  })))
+  .pipe(gulp.dest(cssFinal));
 
-//   // let a = pathExists.sync(imgFinal);
-//   // let b = pathExists.sync(cssFinal);
+  // 监听 img 和 css 文件的生成，都生成成功后再停止 loading
+  // let watchFilepathImg = Path.resolve(imgFinal, '*.{jpeg,jpg,png,gif,svg,JPEG,JPG,PNG,GIF,SVG}');
+  let watchFilepathImg = Path.resolve(imgFinal, '*.*');
+  // let watchFilepathCss = Path.resolve(cssFinal, '*.css');
+  let watchFilepathCss = Path.resolve(cssFinal, '*.*');
+  let isImgFin = !pathExists.sync(imgFinal), isCssFin = !pathExists.sync(cssFinal);
 
-//   // console.log('imgFinal pathExists', a);
-//   // console.log('cssFinal pathExists', b);
+  let watcherImg = watch(watchFilepathImg, function () {
+    console.log('watching:',watchFilepathImg);
+    if (isCssFin) {
+      callback('finished')
+    }
+    isImgFin = true;
+    watcherImg.close();
+  });
 
-//   let watcherImg = watch(watchFilepathImg, function () {
-//     console.log('watching:',watchFilepathImg);
-//     if (isCssFin) {
-//       callback('finished')
-//     }
-//     isImgFin = true;
-//     watcherImg.close();
-//   });
+  let watcherCss = watch(watchFilepathCss, function () {
+    console.log('watching:',watchFilepathCss);
+    if (isImgFin) {
+      callback('finished')
+    }
+    isCssFin = true;
+    watcherCss.close();
+  });
 
-//   let watcherCss = watch(watchFilepathCss, function () {
-//     console.log('watching:',watchFilepathCss);
-//     if (isImgFin) {
-//       callback('finished')
-//     }
-//     isCssFin = true;
-//     watcherCss.close();
-//   });
-
-//   // Return a merged stream to handle both `end` events
-//   // return merge(imgStream, cssStream);
-//   return false;
-// }
+  // Return a merged stream to handle both `end` events
+  // return merge(imgStream, cssStream);
+  return false;
+}
 
 
 
@@ -417,6 +403,7 @@ const FUNCS = {
   // css
   'prefix': prefixCSS,
   'compress': compressCSS,
+  'spriter': spriteCSS,
   // js
   'uglify': uglifyJS,
   // image
@@ -436,6 +423,7 @@ const LOGS = {
   // css
   'prefix': '添加兼容性前缀',
   'compress': '压缩 css',
+  'spriter': '处理 css 生成精灵图',
   // js
   'uglify': '压缩 js',
   // image
@@ -466,7 +454,7 @@ var handleIMG = (actionsName, src, dist, configs, callback) => {
   actionsName.forEach(function(element) {
     console.log(`执行操作：${element}`);
     callback(LOGS[element])
-    if (element == 'sprite') {
+    if (element.indexOf('sprite')) {
       // 精灵图处理函数中单独对 css 和 img 进行了导出操作
       configs.callback = callback;
     } 
