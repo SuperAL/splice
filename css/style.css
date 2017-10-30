@@ -245,7 +245,42 @@
 		 .loading-log {
 		 	color: #666;
 		 }
-
+			
+		 #loading-modal .icon-close-loading {
+		 	width: 30px;
+		 	height: 30px;
+		 	position: absolute;
+		 	top: 20px;
+		 	right: 20px;
+		 	font-size: 40px;
+		 	cursor: pointer;
+		 }
+		 .mark {
+		 	background-color: #999;
+		 	position: absolute;
+		 	height: 30px;
+		 	width: 2px;
+		 	display: block;
+		 	top: 0;
+		 	-webkit-transition: all 200ms ease-in-out;
+		 	-moz-transition: all 200ms ease-in-out;
+		 	-ms-transition: all 200ms ease-in-out;
+		 	-o-transition: all 200ms ease-in-out;
+		 	transition: all 200ms ease-in-out;
+		 	cursor: pointer;
+		 }
+		 .mark.x  {
+		 	right: 14px;
+		 	transform:rotate(45deg); /* TODO: prefix */
+		 }
+		 .mark.xx {
+		 	left: 14px;
+		 	transform:rotate(-45deg); /* TODO: prefix */
+		 }
+		 #loading-modal .icon-close-loading:hover .mark {
+			background-color: #000;
+		 }
+		 
 
 
 

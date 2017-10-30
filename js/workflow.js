@@ -154,24 +154,32 @@ var spriteCSS = (stream, {dest, pattern, imgName, cssName, imgPath, isImgMin, im
   // let watchFilepathCss = Path.resolve(cssFinal, '*.css');
   let watchFilepathCss = Path.resolve(cssFinal, '*.*');
   let isImgFin = !pathExists.sync(imgFinal), isCssFin = !pathExists.sync(cssFinal);
+  console.log(watchFilepathImg, isImgFin, watchFilepathCss, isCssFin);
 
-  let watcherImg = watch(watchFilepathImg, function () {
-    console.log('watching:',watchFilepathImg);
-    if (isCssFin) {
-      callback('finished')
-    }
-    isImgFin = true;
-    watcherImg.close();
-  });
 
-  let watcherCss = watch(watchFilepathCss, function () {
-    console.log('watching:',watchFilepathCss);
-    if (isImgFin) {
-      callback('finished')
-    }
-    isCssFin = true;
-    watcherCss.close();
-  });
+  console.log('watching:', watchFilepathImg, watchFilepathCss);
+  if (isImgFin && isCssFin) {
+    setTimeout(() => {
+      callback('finished');
+    }, 3000)
+  } else {
+    let watcherImg = watch(watchFilepathImg, function () {
+      if (isCssFin) {
+        callback('finished')
+      }
+      isImgFin = true;
+      watcherImg.close();
+    });
+
+    let watcherCss = watch(watchFilepathCss, function () {
+      console.log('watching:',watchFilepathCss);
+      if (isImgFin) {
+        callback('finished')
+      }
+      isCssFin = true;
+      watcherCss.close();
+    });
+  }
 
   // Return a merged stream to handle both `end` events
   // return merge(imgStream, cssStream);
@@ -279,23 +287,29 @@ var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, is
   // console.log('imgFinal pathExists', a);
   // console.log('cssFinal pathExists', b);
 
-  let watcherImg = watch(watchFilepathImg, function () {
-    console.log('watching:',watchFilepathImg);
-    if (isCssFin) {
-      callback('finished')
-    }
-    isImgFin = true;
-    watcherImg.close();
-  });
+  console.log('watching:', watchFilepathImg, watchFilepathCss);
+  if (isImgFin && isCssFin) {
+    setTimeout(() => {
+      callback('finished');
+    }, 3000)
+  } else {
+    let watcherImg = watch(watchFilepathImg, function () {
+      if (isCssFin) {
+        callback('finished')
+      }
+      isImgFin = true;
+      watcherImg.close();
+    });
 
-  let watcherCss = watch(watchFilepathCss, function () {
-    console.log('watching:',watchFilepathCss);
-    if (isImgFin) {
-      callback('finished')
-    }
-    isCssFin = true;
-    watcherCss.close();
-  });
+    let watcherCss = watch(watchFilepathCss, function () {
+      console.log('watching:',watchFilepathCss);
+      if (isImgFin) {
+        callback('finished')
+      }
+      isCssFin = true;
+      watcherCss.close();
+    });
+  }
 
   // Return a merged stream to handle both `end` events
   // return merge(imgStream, cssStream);
@@ -454,7 +468,7 @@ var handleIMG = (actionsName, src, dist, configs, callback) => {
   actionsName.forEach(function(element) {
     console.log(`执行操作：${element}`);
     callback(LOGS[element])
-    if (element.indexOf('sprite')) {
+    if (element.indexOf('sprite') !== -1) {
       // 精灵图处理函数中单独对 css 和 img 进行了导出操作
       configs.callback = callback;
     } 
