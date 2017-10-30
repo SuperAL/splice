@@ -64,9 +64,9 @@
           <p class="current-actions">您要执行的操作是：
             <span v-for="(action, index) in currentActions" v-cloak>{{ action.action.name + ((currentActions.length !== (index+1))?" + ":"")}}</span>
           </p>
-          <p class="desc">＊用法：拖拽文件到下面的线框中（或者直接点击选取文件），会自动在所选文件目录下生成处理后的文件，支持一次处理多个文件。
+          <p class="desc">＊用法：拖拽文件到下面的线框中（或者直接点击选取文件），会自动在所选文件目录下生成处理后的文件，<b>未添加重命名操作的话处理后的文件默认会覆盖原文件</b>，支持一次处理多个文件。
           </p>
-          <p class="desc">＊注意：除了重命名外，其他操作一次只能处理一种文件类型。
+          <p class="desc">＊注意：除了通用功能外，其他操作一次只能处理一种文件类型。
           </p>
           <p class="desc">＊提示：图片操作支持格式：jpeg,jpg,png,gif,svg。
           </p>
@@ -89,6 +89,10 @@
       </div>
     </div>
     <div id="loading-modal" v-show="isLoading">
+      <span class="icon-close-loading" @click="closeLoading">
+        <i class="mark x"></i>
+        <i class="mark xx"></i>
+      </span>
       <div class="loading-animation">
         <div class="loading"></div>
         <div id="loading-text" v-text="loadingMsg">加载中...</div>

@@ -350,6 +350,7 @@ var app = new Vue({
         currentCategory: '',
         currentActions: [],
         isLoading: false,
+        manually: false,
         loadingMsg: '处理中...',
         isDone: false,
         message: '处理成功',
@@ -376,6 +377,10 @@ var app = new Vue({
     },
     watch: {
         isLoading(newVal) {
+            if (this.manually) {
+                this.manually = false;
+                return;
+            }
             if (!newVal) {
                 let vm = this;
                 vm.message = '处理成功';
@@ -464,6 +469,10 @@ var app = new Vue({
         },
         openExternal(link) {
             shell.openExternal(link);
+        },
+        closeLoading() {
+            this.manually = true;
+            this.isLoading = false;
         }
     }
 })
