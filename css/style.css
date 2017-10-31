@@ -246,15 +246,6 @@
 		 	color: #666;
 		 }
 			
-		 #loading-modal .icon-close-loading {
-		 	width: 30px;
-		 	height: 30px;
-		 	position: absolute;
-		 	top: 20px;
-		 	right: 20px;
-		 	font-size: 40px;
-		 	cursor: pointer;
-		 }
 		 .mark {
 		 	background-color: #999;
 		 	position: absolute;
@@ -276,6 +267,15 @@
 		 .mark.xx {
 		 	left: 14px;
 		 	transform:rotate(-45deg); /* TODO: prefix */
+		 }
+		 #loading-modal .icon-close-loading {
+		 	width: 30px;
+		 	height: 30px;
+		 	position: absolute;
+		 	top: 20px;
+		 	right: 20px;
+		 	font-size: 40px;
+		 	cursor: pointer;
 		 }
 		 #loading-modal .icon-close-loading:hover .mark {
 			background-color: #000;
@@ -449,6 +449,63 @@
 .notification-fade-leave-active {
 	opacity: 0
 }
+
+/*其他样式*/
+.link {
+	cursor: pointer;
+	color: #00a5e0;
+}
+.btn {
+	border-radius: 5px;
+	padding: 8px;
+	font-size: 14px;
+	line-height: 1;
+	text-decoration: none;
+	margin: 20px auto 0 auto;
+	color: #fff;
+	position: relative;
+	display: inline-block;
+	cursor: pointer;
+}
+.red {
+	background-color: #e74c3c;
+	box-shadow: 0px 5px 0px 0px #CE3323;
+}
+.red:hover {
+	background-color: #FF6656;
+}
+.updating-notification .btn {
+	display: block;
+	text-align: center;
+}
+.updating-notification .icon-close-updating {
+	width: 15px;
+	height: 15px;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	font-size: 40px;
+	cursor: pointer;
+}
+.updating-notification .icon-close-updating:hover .mark {
+	background-color: #000;
+}
+.updating-notification .mark {
+	height: 15px;
+	width: 1px;
+}
+.updating-notification .mark.x  {
+	right: 7px;
+}
+.updating-notification .mark.xx {
+	left: 7px;
+}
+.loader--style {
+	display: inline-block;
+	margin-right: 5px;
+	vertical-align: middle;
+}
+
 
 /*scrollbar*/
 ::-webkit-scrollbar-track

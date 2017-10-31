@@ -99,7 +99,15 @@
       <!-- <span class="loading-log">{{currentStatus}}</span> -->
     </div>
     <transition name="notification-fade">
-    <div v-show="isDone" class="notification" style="top: 16px; z-index: 9;" :style="{opacity: 1}"><div class="notification__group notification__notitle"><h2 class="notification__title" style="display: none;">提示</h2><div class="notification__content">{{ message }}</div><div class="notification__closeBtn icon-close"></div></div></div>
+      <div v-show="isDone" class="notification" style="top: 16px; z-index: 9;" :style="{opacity: 1}"><div class="notification__group notification__notitle"><h2 class="notification__title" style="display: none;">提示</h2><div class="notification__content">{{ message }}</div><div class="notification__closeBtn icon-close"></div></div></div>
+    </transition>
+    <transition name="notification-fade">
+      <div v-show="needUpdating" class="notification updating-notification" style="top: 16px; z-index: 9;" :style="{opacity: 1}">
+        <span class="icon-close-updating" @click="closeUpdating">
+          <i class="mark x"></i>
+          <i class="mark xx"></i>
+        </span>
+        <div class="notification__group notification__notitle"><div class="notification__content" v-cloak>当前版本：{{ newVersion.current }}<br>可升级到：{{ newVersion.latest }} ( <span class="link" @click="openExternal(newVersion.url)">升级日志</span> )</div><a href="#!" class="btn red"><loader></loader><span>一键升级</span></a><div class="notification__closeBtn icon-close"></div></div></div>
     </transition>
   </div>
   <script type="text/javascript" src="./js/jquery-1.8.2.js"></script>
