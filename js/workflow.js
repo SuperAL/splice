@@ -1,38 +1,3 @@
-var fs = require('fs');
-var Path = require("path");
-var gulp = require('gulp');
-var gulpif = require('gulp-if');
-var postcss = require('gulp-postcss');
-var minifyCSS = require('gulp-cssnano');
-var rename = require('gulp-rename');
-var autoprefixer = require('autoprefixer');
-var uglify = require("gulp-uglify");
-var htmlmin = require('gulp-htmlmin');
-var prettify = require('gulp-jsbeautifier');
-
-// 通过 css 生成精灵图
-var spriter = require('gulp-sprite-generator2');
-
-// json 文件处理
-var jsonMinify = require('gulp-json-minify');
-
-// 图片压缩
-var imagemin = require('gulp-imagemin');
-var pngquant = require('imagemin-pngquant');
-
-// 精灵图处理
-var spritesmith = require('gulp.spritesmith');
-var buffer = require('vinyl-buffer');
-var merge = require('merge-stream');
-
-// usemin
-var usemin = require('gulp-usemin2');
-var cleanCSS = require('gulp-clean-css');
-
-// for loading 
-var watch = require('gulp-watch');
-var pathExists = require('path-exists');
-
 /**
  * -----------------------------------------------------------------
  * HTML 文件相关操作
@@ -114,6 +79,7 @@ var spriteCSS = (stream, {dest, pattern, imgName, cssName, imgPath, isImgMin, im
           spriteSheetName: imgName.trim() ? imgName : "[name].sprite.png", // 会自动把 [name] 替换成正在处理文件名
           styleSheetName: cssName,
           spriteSheetPath: imgPath,
+          padding: 4,
           filter: [
               function(image) {
                 return reg.test(image.url) // 只对名称符合正则的图片进行雪碧图合并
@@ -121,8 +87,8 @@ var spriteCSS = (stream, {dest, pattern, imgName, cssName, imgPath, isImgMin, im
           ]
       }))
 
-  let imgFinal = Path.resolve(dest, imgDest);
-  let cssFinal = Path.resolve(dest, cssDest);
+  let imgFinal = path.resolve(dest, imgDest);
+  let cssFinal = path.resolve(dest, cssDest);
 
   // Pipe image stream through image optimizer and onto disk
   var imgStream = spriteOutput.img
@@ -149,10 +115,10 @@ var spriteCSS = (stream, {dest, pattern, imgName, cssName, imgPath, isImgMin, im
   .pipe(gulp.dest(cssFinal));
 
   // 监听 img 和 css 文件的生成，都生成成功后再停止 loading
-  // let watchFilepathImg = Path.resolve(imgFinal, '*.{jpeg,jpg,png,gif,svg,JPEG,JPG,PNG,GIF,SVG}');
-  let watchFilepathImg = Path.resolve(imgFinal, '*.*');
-  // let watchFilepathCss = Path.resolve(cssFinal, '*.css');
-  let watchFilepathCss = Path.resolve(cssFinal, '*.*');
+  // let watchFilepathImg = path.resolve(imgFinal, '*.{jpeg,jpg,png,gif,svg,JPEG,JPG,PNG,GIF,SVG}');
+  let watchFilepathImg = path.resolve(imgFinal, '*.*');
+  // let watchFilepathCss = path.resolve(cssFinal, '*.css');
+  let watchFilepathCss = path.resolve(cssFinal, '*.*');
   let isImgFin = !pathExists.sync(imgFinal), isCssFin = !pathExists.sync(cssFinal);
   console.log(watchFilepathImg, isImgFin, watchFilepathCss, isCssFin);
 
@@ -248,8 +214,8 @@ var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, is
     imgPath: imgPath,
     padding: 4
   }));
-  let imgFinal = Path.resolve(dest, imgDest);
-  let cssFinal = Path.resolve(dest, cssDest);
+  let imgFinal = path.resolve(dest, imgDest);
+  let cssFinal = path.resolve(dest, cssDest);
   // Pipe image stream through image optimizer and onto disk
   var imgStream = spriteData.img
     // DEV: We must buffer our stream into a Buffer for `imagemin`
@@ -275,10 +241,10 @@ var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, is
   .pipe(gulp.dest(cssFinal));
 
   // 监听 img 和 css 文件的生成，都生成成功后再停止 loading
-  // let watchFilepathImg = Path.resolve(imgFinal, '*.{jpeg,jpg,png,gif,svg,JPEG,JPG,PNG,GIF,SVG}');
-  let watchFilepathImg = Path.resolve(imgFinal, '*.*');
-  // let watchFilepathCss = Path.resolve(cssFinal, '*.css');
-  let watchFilepathCss = Path.resolve(cssFinal, '*.*');
+  // let watchFilepathImg = path.resolve(imgFinal, '*.{jpeg,jpg,png,gif,svg,JPEG,JPG,PNG,GIF,SVG}');
+  let watchFilepathImg = path.resolve(imgFinal, '*.*');
+  // let watchFilepathCss = path.resolve(cssFinal, '*.css');
+  let watchFilepathCss = path.resolve(cssFinal, '*.*');
   let isImgFin = !pathExists.sync(imgFinal), isCssFin = !pathExists.sync(cssFinal);
 
   // let a = pathExists.sync(imgFinal);  
@@ -476,8 +442,8 @@ var handleIMG = (actionsName, src, dist, configs, callback) => {
   })
   // 精灵图操作 stream 返回 false
   if (stream) {
-    // let watchFilepath = Path.resolve(dist, '*.{jpeg,jpg,png,gif,svg}');
-    let watchFilepath = Path.resolve(dist, '*.*');
+    // let watchFilepath = path.resolve(dist, '*.{jpeg,jpg,png,gif,svg}');
+    let watchFilepath = path.resolve(dist, '*.*');
     stream.pipe(gulp.dest(dist));
     let watcher = watch(watchFilepath, function () {
       callback('finished')
@@ -506,7 +472,7 @@ var handleIMG = (actionsName, src, dist, configs, callback) => {
     callback(LOGS[element])
     stream = FUNCS[element](stream, configs);
   })
-  let watchFilepath = Path.resolve(dist, '*.*');
+  let watchFilepath = path.resolve(dist, '*.*');
   stream.pipe(gulp.dest(dist));
   let watcher = watch(watchFilepath, function () {
     callback('finished')
@@ -514,3 +480,5 @@ var handleIMG = (actionsName, src, dist, configs, callback) => {
     console.log('watching');
   });
 }
+
+

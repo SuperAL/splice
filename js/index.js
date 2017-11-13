@@ -1,6 +1,3 @@
-const { dialog, shell } = require('electron').remote
-const objectMerge = require('object-merge');
-
 // 方法名对照
 const categoryFUNCS = {
     'HTML': handleALL,
@@ -95,8 +92,7 @@ var loader = {
 }
 
 let storedActions = getStore('actions');
-let defaultActions = [
-    {
+let defaultActions = [{
         name: 'HTML',
         list: [
             { name: '压缩', funcName: 'htmlmin', icon: 'html', disabled: false }, {
@@ -127,70 +123,73 @@ let defaultActions = [
             }
         ]
     },
-    { name: 'CSS', list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'css', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'css', disabled: false }, {
-        name: '精灵图',
-        funcName: 'spriter',
-        icon: 'css',
-        disabled: false,
-        isSolo: true,
-        wiki: 'https://www.zybuluo.com/alexlee/note/932749',
-        configs: [{
-            type: 'custom-input',
-            label: '正则筛选想要处理的图片路径',
-            key: 'pattern',
-            value: '',
-            placeholder: '例：png'
-        },{
-            type: 'custom-input',
-            label: '精灵图文件名',
-            key: 'imgName',
-            value: '',
-            placeholder: '默认：css文件名.sprite.png'
-        },
-        {
-            type: 'custom-input',
-            label: 'css文件名',
-            key: 'cssName',
-            value: 'style.css'
-        },
-        {
-            type: 'custom-input',
-            label: '生成的css中图片相对地址',
-            key: 'imgPath',
-            value: '../image'
-        },
-        {
-            type: 'custom-input',
-            label: '精灵图导出地址',
-            key: 'imgDest',
-            value: './dist/image'
-        },
-        {
-            type: 'custom-input',
-            label: 'css导出地址',
-            key: 'cssDest',
-            value: './dist/css'
-        },
-        {
-            type: 'custom-checkbox',
-            label: '是否压缩精灵图',
-            key: 'isImgMin',
-            value: true
-        },
-        {
-            type: 'custom-checkbox',
-            label: '是否压缩css',
-            key: 'isCssMin',
-            value: false
-        },
-        {
-            type: 'custom-checkbox',
-            label: '是否保存设置',
-            key: 'isSaved',
-            value: false
-        }
-        ]
-    }] },
+    {
+        name: 'CSS',
+        list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'css', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'css', disabled: false }, {
+            name: '精灵图',
+            funcName: 'spriter',
+            icon: 'css',
+            disabled: false,
+            isSolo: true,
+            wiki: 'https://www.zybuluo.com/alexlee/note/932749',
+            configs: [{
+                    type: 'custom-input',
+                    label: '正则筛选想要处理的图片路径',
+                    key: 'pattern',
+                    value: '',
+                    placeholder: '例：png'
+                }, {
+                    type: 'custom-input',
+                    label: '精灵图文件名',
+                    key: 'imgName',
+                    value: '',
+                    placeholder: '默认：css文件名.sprite.png'
+                },
+                {
+                    type: 'custom-input',
+                    label: 'css文件名',
+                    key: 'cssName',
+                    value: 'style.css'
+                },
+                {
+                    type: 'custom-input',
+                    label: '生成的css中图片相对地址',
+                    key: 'imgPath',
+                    value: '../image'
+                },
+                {
+                    type: 'custom-input',
+                    label: '精灵图导出地址',
+                    key: 'imgDest',
+                    value: './dist/image'
+                },
+                {
+                    type: 'custom-input',
+                    label: 'css导出地址',
+                    key: 'cssDest',
+                    value: './dist/css'
+                },
+                {
+                    type: 'custom-checkbox',
+                    label: '是否压缩精灵图',
+                    key: 'isImgMin',
+                    value: true
+                },
+                {
+                    type: 'custom-checkbox',
+                    label: '是否压缩css',
+                    key: 'isCssMin',
+                    value: false
+                },
+                {
+                    type: 'custom-checkbox',
+                    label: '是否保存设置',
+                    key: 'isSaved',
+                    value: false
+                }
+            ]
+        }]
+    },
     { name: 'JS', list: [{ name: '压缩', funcName: 'uglify', icon: 'js', disabled: false }] },
     {
         name: 'IMAGE',
@@ -368,12 +367,18 @@ var app = new Vue({
         loadingMsg: '处理中...',
         isDone: false,
         message: '处理成功',
-        needUpdating: true, // 显示升级提示
-        newVersion: {
-            current: '1.0.0',
-            latest: '1.1.0',
+        needUpdating: false, // 显示升级提示
+        updateInfo: {
+            current: '',
+            latest: '',
             url: 'https://github.com/SuperAL/splice/releases/'
         },
+        updateBtnText: '一键升级',
+        updateLoading: false,
+        // 报错、成功信息提示
+        showMsg: false,
+        msg: '',
+
         clear: null, // clear setTimeout
         currentStatus: '',
         isSolo: false, // 当前只有一个操作，不能拼接其他操作
@@ -494,6 +499,7 @@ var app = new Vue({
         closeLoading() {
             this.manually = true;
             this.isLoading = false;
+            this.loadingMsg = '处理中...'; // 重置文字，有可能是 '检查中...'
         },
         closeUpdating() {
             this.manually = true;
@@ -502,7 +508,7 @@ var app = new Vue({
     }
 })
 
-
+updater.init(app);
 
 let drake;
 
@@ -670,7 +676,7 @@ var handleFiles = (filePaths) => {
     // 判断是否批量操作文件
     let isTotal = app.currentActionsName.indexOf('sprite') !== -1;
     let multiSrc = [];
-    let multiFileDir = Path.dirname(filePaths[0]);
+    let multiFileDir = path.dirname(filePaths[0]);
 
 
     // 获取当前操作方法
@@ -688,7 +694,7 @@ var handleFiles = (filePaths) => {
             let stats = fs.statSync(filepath);
             if (stats && stats.isDirectory()) {
                 multiSrc.push(Path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'));
-                console.log(stats, filepath, Path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'), multiSrc)
+                console.log(stats, filepath, path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'), multiSrc)
             } else {
                 multiSrc.push(filepath);
             }
@@ -710,7 +716,7 @@ var handleFiles = (filePaths) => {
 
             // 判断文件格式
             if (handleFileType(fileType)) {
-                let fileDir = Path.dirname(results);
+                let fileDir = path.dirname(results);
 
                 // 如果未设置 basename 和 extname，默认使用原文件的信息
                 if (app.currentActionsName.indexOf('rename') !== -1) {
@@ -722,7 +728,7 @@ var handleFiles = (filePaths) => {
                 }
 
                 // 判断是否设置了 导出目录，默认导出到当前目录，保存在 configs 变量里是为了让 spriteIMG 操作可以获取到
-                singleConfig.dest = !!singleConfig.dest ? Path.resolve(fileDir, singleConfig.dest) : fileDir;
+                singleConfig.dest = !!singleConfig.dest ? path.resolve(fileDir, singleConfig.dest) : fileDir;
                 //有文件，直接覆盖；没有文件，新建文件
                 app.isLoading = true;
                 handleFUNC(app.currentActionsName, results, singleConfig.dest, singleConfig, function(currentStatus) {
@@ -744,7 +750,7 @@ var handleFiles = (filePaths) => {
     // 批量处理文件（sprite 操作）
     if (isTotal) {
         // 判断是否设置了 导出目录，默认导出到当前目录，保存在 configs 变量里是为了让 spriteIMG 操作可以获取到
-        configs.dest = !!configs.dest ? Path.resolve(multiFileDir, configs.dest) : multiFileDir;
+        configs.dest = !!configs.dest ? path.resolve(multiFileDir, configs.dest) : multiFileDir;
         //有文件，直接覆盖；没有文件，新建文件
         app.isLoading = true;
         handleFUNC(app.currentActionsName, multiSrc, configs.dest, configs, function(currentStatus) {
@@ -830,7 +836,7 @@ var walk = function(dir, done) {
         if (stats && stats.isDirectory()) {
             fs.readdir(dir, function(err, list) {
                 list.forEach(function(file) {
-                    file = Path.resolve(dir, file);
+                    file = path.resolve(dir, file);
                     walk(file, done);
                 });
             });
@@ -856,3 +862,5 @@ Date.prototype.Format = function(fmt) { //author: meizz
         if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
     return fmt;
 }
+
+

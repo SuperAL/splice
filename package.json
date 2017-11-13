@@ -1,6 +1,21 @@
 {
   "name": "splice",
   "version": "1.1.0",
+  "manifest": [
+    {
+      "version": "1.1.1",
+      "files": [
+        "README.md",
+        "css/style.css"
+      ],
+      "packages": [
+        "gulp-run"
+      ],
+      "logs": [
+        "测试热更新功能"
+      ]
+    }
+  ],
   "description": "GUI workflow for Front-End developers based on Electron",
   "main": "main.js",
   "repository": "https://github.com/SuperAL/splice.git",
@@ -12,6 +27,7 @@
   "license": "GPL-3.0",
   "scripts": {
     "start": "electron .",
+    "bundle": "webpack --config webpack.config.js",
     "pack:mac": "electron-packager ./ Splice --platform=darwin --arch=x64 --overwrite --out=../splice-dist/ --icon=icon/logo.icns --version 1.2.5  --ignore='(.DS_Store)'",
     "pack:win": "electron-packager ./ Splice --platform=win32 --arch=x64 --overwrite --out=../splice-dist/ --icon=icon/logo.ico --version 1.2.5",
     "pack:win32": "electron-packager ./ Splice --platform=win32 --arch=ia32 --overwrite --out=../splice-dist/ --icon=icon/logo.ico --version 1.2.5"
@@ -32,7 +48,6 @@
     "gulp-rev": "^8.0.0",
     "gulp-sprite-generator2": "^1.0.4",
     "gulp-uglify": "^3.0.0",
-    "gulp-usemin": "^0.3.28",
     "gulp-usemin2": "^0.2.4",
     "gulp-watch": "^4.3.11",
     "gulp.spritesmith": "^6.5.1",
@@ -43,9 +58,12 @@
     "vinyl-buffer": "^1.0.0"
   },
   "devDependencies": {
-    "electron": "^1.6.11",
+    "electron": "^1.7.5",
     "electron-packager": "^8.7.2",
-    "electron-reload": "^1.2.1"
+    "electron-reload": "^1.2.1",
+    "node-loader": "^0.6.0",
+    "shebang-loader": "0.0.1",
+    "webpack": "^3.8.1"
   },
   "browserslist": [
     "> 0.5%",
