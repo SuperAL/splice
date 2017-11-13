@@ -470,6 +470,6 @@ var updater = {
         // 右键菜单
         this.contextmenu();
         // 版本检测
-        // this.updateDetect(app);
+        this.updateDetect(app);
     }   
 };
