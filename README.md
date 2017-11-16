@@ -29,7 +29,11 @@ GUI workflow for Front-End developers based on Electron
 ### 其他：
 - 快捷键：
 	- 刷新页面：Ctrl+Alt+R
-	- 开启或关闭开发者工具: Ctrl+Alt+T
+	- 开启或关闭开发者工具：Ctrl+Alt+T
+- 右键菜单：
+	- 刷新：刷新页面
+	- 开发者工具：开启或关闭开发者工具
+	- 检查更新：检查是否有新版本
 
 ## 截图
 
@@ -42,7 +46,7 @@ GUI workflow for Front-End developers based on Electron
 
 ## 下载地址
 
-[win](https://github.com/SuperAL/splice/releases/download/1.0.0/Splice-win32-x64.zip) | [mac](https://github.com/SuperAL/splice/releases/download/1.0.0/Splice-darwin-x64.zip)
+[win](https://github.com/SuperAL/splice/releases/download/1.1.0/Splice-win32-x64.zip) | [mac](https://github.com/SuperAL/splice/releases/download/1.1.0/Splice-darwin-x64.zip)
 
 ## 协议
 
