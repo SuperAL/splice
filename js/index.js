@@ -768,6 +768,13 @@ var handleFiles = (filePaths) => {
     if (isTotal) {
         // 判断是否设置了 导出目录，默认导出到当前目录，保存在 configs 变量里是为了让 spriteIMG 操作可以获取到
         configs.dest = !!configs.dest ? path.resolve(multiFileDir, configs.dest) : multiFileDir;
+        
+        // 判断是否存在需要处理的文件
+        if (multiSrc.length === 0) {
+            alert(`没有需要处理的文件～`);
+            return;
+        }
+
         //有文件，直接覆盖；没有文件，新建文件
         app.isLoading = true;
         handleFUNC(app.currentActionsName, multiSrc, configs.dest, configs, function(currentStatus) {
