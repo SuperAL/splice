@@ -1,12 +1,11 @@
 {
   "name": "splice",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "manifest": [
     {
       "version": "1.1.1",
       "files": [
-        "README.md",
-        "css/style.css"
+        "README.md"
       ],
       "packages": [
         "gulp-run"
@@ -46,6 +45,7 @@
     "gulp-postcss": "^7.0.0",
     "gulp-rename": "^1.2.2",
     "gulp-rev": "^8.0.0",
+    "gulp-run": "^1.7.1",
     "gulp-sprite-generator2": "^1.0.4",
     "gulp-uglify": "^3.0.0",
     "gulp-usemin2": "^0.2.4",

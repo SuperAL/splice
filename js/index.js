@@ -370,8 +370,7 @@ var app = new Vue({
         needUpdating: false, // 显示升级提示
         updateInfo: {
             current: '',
-            latest: '',
-            url: 'https://github.com/SuperAL/splice/releases/'
+            latest: ''
         },
         updateBtnText: '一键升级',
         updateLoading: false,
@@ -383,7 +382,14 @@ var app = new Vue({
         currentStatus: '',
         isSolo: false, // 当前只有一个操作，不能拼接其他操作
 
-        file_types: [] // 全局存放 格式化操作 新增的文件后缀
+        file_types: [], // 全局存放 格式化操作 新增的文件后缀
+
+        // 对话框相关
+        showDialogBtn: false,
+        showDialog: false,
+        dialogTitle: '',
+        dialogContent: '',
+        dialogBtn: ''
     },
     computed: {
         currentActionsName() {
@@ -399,7 +405,9 @@ var app = new Vue({
         customRadio,
         customCheckbox,
         loader
-
+    },
+    mounted() {
+        updater.init(this);
     },
     watch: {
         isLoading(newVal) {
@@ -496,11 +504,13 @@ var app = new Vue({
         openExternal(link) {
             shell.openExternal(link);
         },
+        // 关闭全屏 loading
         closeLoading() {
             this.manually = true;
             this.isLoading = false;
             this.loadingMsg = '处理中...'; // 重置文字，有可能是 '检查中...'
         },
+        // 关闭更新提示框
         closeUpdating() {
             this.manually = true;
             this.needUpdating = false;
@@ -508,7 +518,7 @@ var app = new Vue({
     }
 })
 
-updater.init(app);
+
 
 let drake;
 
