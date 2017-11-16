@@ -703,10 +703,18 @@ var handleFiles = (filePaths) => {
             // src/**/*.{jpeg,jpg,png,gif,svg}
             let stats = fs.statSync(filepath);
             if (stats && stats.isDirectory()) {
-                multiSrc.push(Path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'));
+                // 如果是文件夹且文件夹下没有图片时，不会报错，但是会一直处理中，因为没有监测到任何的文件变动
+                // 如果有图片，就会处理这些图片
+                multiSrc.push(path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'));
                 console.log(stats, filepath, path.join(filepath, '/**/*.{jpeg,jpg,png,gif,svg}'), multiSrc)
             } else {
-                multiSrc.push(filepath);
+                // 如果是文件，且包含非图片的文件，就会报错：
+                // Uncaught Error: Unsupported file type: text/css
+                let { fileType } = getFileInfo(filepath);
+                // 判断格式，非图片会提示，但不影响精灵图操作
+                if (handleFileType(fileType)) {
+                    multiSrc.push(filepath);
+                }
             }
             continue;
             // 跳过以下内容继续执行 for 语句
@@ -714,15 +722,14 @@ var handleFiles = (filePaths) => {
 
         // 分别处理单个文件
         walk(filepath, function(err, results) {
+            // results:
+            // F:\Projects - relative\slice-workflow - relative\样式优化\style.css
+            
             // 克隆配置信息，针对单个文件进行配置信息的再处理
             let singleConfig = deepClone(configs);
 
-            var fileTypeArr = results.split('.'),
-                // 文件类型 fileType: css
-                fileType = fileTypeArr[fileTypeArr.length - 1],
-                fileNameArr = results.split("\\"),
-                // 文件名 fileName: test.css
-                fileName = fileNameArr[fileNameArr.length - 1];
+            console.log('results is', results);
+            let { fileType, fileName } = getFileInfo(results);
 
             // 判断文件格式
             if (handleFileType(fileType)) {
@@ -854,6 +861,19 @@ var walk = function(dir, done) {
             done(err, dir);
         }
     });
+};
+
+var getFileInfo = function(filepath) {
+    let fileTypeArr = filepath.split('.'),
+        // 文件类型 fileType: css
+        fileType = fileTypeArr[fileTypeArr.length - 1],
+        fileNameArr = filepath.split("\\"),
+        // 文件名 fileName: test.css
+        fileName = fileNameArr[fileNameArr.length - 1];
+    return {
+        fileType,
+        fileName
+    }
 };
 
 // new Date().Format("yyyy-MM-dd");
