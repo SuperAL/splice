@@ -433,22 +433,15 @@
 	color: #97a8be
 }
 
+/*notification transition 动画*/ 
 .notification-fade-enter {
 	transform: translateX(100%);
 	right: 0
 }
-
 .notification-fade-leave-active {
 	opacity: 0
 }
-.notification-fade-enter {
-	transform: translateX(100%);
-	right: 0
-}
 
-.notification-fade-leave-active {
-	opacity: 0
-}
 
 /*其他样式*/
 .link {
