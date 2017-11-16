@@ -407,7 +407,7 @@ var app = new Vue({
         loader
     },
     mounted() {
-        updater.init(this);
+        // updater.init(this);
     },
     watch: {
         isLoading(newVal) {
