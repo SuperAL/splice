@@ -434,12 +434,13 @@
 }
 
 /*notification transition 动画*/ 
-.notification-fade-enter {
-	transform: translateX(100%);
-	right: 0
+.notification-fade-enter-active, .notification-fade-leave-active {
+	transition: all .3s ease;
 }
-.notification-fade-leave-active {
-	opacity: 0
+.notification-fade-enter, .notification-fade-leave-to {
+	transform: translateX(100%);
+	opacity: 0;
+	right: 0;
 }
 
 
