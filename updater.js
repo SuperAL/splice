@@ -9,10 +9,10 @@ var updater = {
             label: '刷新',
             role: 'reload'
         }));
-        menu.append(new MenuItem({
-            label: '强制刷新',
-            role: 'forcereload'
-        }));
+        // menu.append(new MenuItem({
+        //     label: '强制刷新',
+        //     role: 'forcereload'
+        // }));
         menu.append(new MenuItem({
             label: '开发者工具',
             role: 'toggledevtools'
@@ -37,7 +37,7 @@ var updater = {
         success = success || function() {};
         error = error || function() {};
 
-        var url = 'https://raw.githubusercontent.com/SuperAL/splice/dev/' + filepath + '?r=' + Math.random();
+        var url = 'https://raw.githubusercontent.com/SuperAL/splice/master/' + filepath + '?r=' + Math.random();
 
         https.get(url, function(res) {
             console.log('res is', res);
@@ -57,6 +57,7 @@ var updater = {
                 rawData += chunk;
             });
 
+            console.log('rawData is', rawData);
             // 请求结束
             res.on('end', function() {
                 // 成功回调
@@ -65,6 +66,9 @@ var updater = {
                 // 出错回调
                 error();
             });
+        }).on('error', (e) => {
+            error('文件获取失败');
+            console.error(e);
         });
     },
     // 创建路径对应的文件夹（如果没有）
@@ -153,7 +157,7 @@ var updater = {
          */
         var detectLoading = {
             show() {
-                app.loadingMsg = '检查中...';
+                app.loadingMsg = '检查更新';
                 app.isLoading = true;
             },
             hide() {
@@ -167,12 +171,16 @@ var updater = {
         // 信息提示的统一处理
         var showMsg = function(msg) {
             detectLoading.hide();
+            // 取消 loading
+            loading.stop();
+            // 按钮状态还原
+            btnTxt('重试');
 
             app.msg = msg ? msg : '更新检测失败';
             app.showMsg = true;
             setTimeout(() => {
                 app.showMsg = false;
-            }, 2000);
+            }, 3000);
         };
         // 升级过程中的百分比进度
         var percentProgress = {
@@ -193,6 +201,9 @@ var updater = {
             },
             update: function() {
                 app.updateBtnText = parseInt((this.current/this.len)*100) +'%';
+            },
+            hasProgress: function() {
+                return app.updateBtnText.indexOf('%') !== -1;
             }
         }
         // 按钮文字切换
@@ -203,6 +214,7 @@ var updater = {
         var showUpdate = function(current, latest) {
             detectLoading.hide();
 
+            app.updateBtnText = '一键升级';
             app.updateInfo.current = current;
             app.updateInfo.latest = latest;
             app.needUpdating = true;
@@ -218,11 +230,41 @@ var updater = {
                 return app.updateLoading;
             }
         }
+        document.getElementById('dialogBtn').addEventListener('click', function(e) {
+            location.reload();
+        });
+        var done = function(progress, autoload, content) {
+            console.log('progress is', progress);
+            progress.forward(2); // 百分比进度到百分百
+            console.log('progress is', progress);
+            // 关闭 loading
+            loading.stop();
+            if (autoload) {
+                setTimeout(function() {
+                    // 升级成功，重载中...
+                    // 提示信息
+                    btnTxt('升级成功，重载中...')
+                    location.reload();
+                }, 3000);
+            } else {
+                if (content) {app.dialogTitle = '模块安装提示';
+                    app.dialogContent = content;
+                    app.showDialogBtn = true;
+                    app.dialogBtn = '重启应用';
+                    app.showDialog = true;
+                    
+                } else {
+                    location.reload();
+                }
+            }
+        }
         /**
          * -----------------------------------------------------------------
          * app 相关 ↑
          * -----------------------------------------------------------------
          */
+
+
 
         // 0.0.00 这种版本转换为可直接比较的内容
         // > '1.1.01'.version()
@@ -260,6 +302,8 @@ var updater = {
                 return;
             }
 
+
+
             // 版本比对
             var versionLocal = jsonLocalPackage.version;
             var versionRemote = jsonRemotePackage.version;
@@ -280,16 +324,35 @@ var updater = {
                     return;
                 }
 
+                // 获取升级日志
+                var logs = objTargetVersion.logs;
+
                 // 显示升级提示
                 showUpdate(versionLocal, versionRemote);
 
+                document.getElementById('showLogs').addEventListener('click', function() {
+                    let content = `<ol>`;
+                    logs.forEach(item => {
+                        content += `<li>${item}</li>`
+                    })
+                    content += `</ol>`;
+                    app.dialogTitle = '升级日志';
+                    app.dialogContent = content;
+                    app.showDialogBtn = false;
+                    app.showDialog = true;
+                })
+
                 // 临时文件夹目录
                 var dirUpdate = path.join(__dirname, versionRemote);
-               
+                
+                console.log('升级按钮点击事件');
                 // 点击升级按钮
-                $('#updateBtn').on('click', function() {
-                    if (loading.isLoading())  return;
-
+                $('#updateBtn').on('click', function(e) {
+                    e.preventDefault();
+                    console.log('updateBtn click');
+                    if (loading.isLoading() || progress.hasProgress())  return;
+                    console.log('updateBtn working');
+                    loading.start();
                     // 这里有一个稍稍复杂的逻辑处理，就是
                     // 升级文件的合并
                     // 用户可能升级的时候，一次性跨度多个版本
@@ -318,6 +381,8 @@ var updater = {
 
                     // 文件个数，百分比进度
                     var length = arrFile.length;
+                    console.log('length', length);
+
                     // 开始升级进度提示
                     var progress = percentProgress.init(length);
 
@@ -400,36 +465,48 @@ var updater = {
                             // 资源全部获取完毕，更新中...                           
                             self.copy(dirUpdate, __dirname);
 
-                            var done = function() {
-                                progress.forward(2); // 百分比进度到百分百
-                                // 关闭 loading
-                                loading.stop();
-                                setTimeout(function() {
-                                    // 升级成功，重载中...
-                                    // 提示信息
-                                    btnTxt('升级成功，重载中...')
-                                    location.reload();
-                                }, 2000);
-                            }
+                            
 
                             // 安装新增模块
                             if (packages.length > 0) {
+                                console.log('需要安装新模块');
                                 self.install(packages, function(stdout, stderr) {
-                                    showMsg(`<b>执行 npm install 安装新增模块时输出如下</b>：
-                                        ${stdout}
-                                        ${stderr}
-                                        <b>如有问题，请自行在应用根目录安装如下模块</b>：
-                                        ${packages.join(', ')}`);
-                                    done();
+                                    console.log('stdout, stderr', stdout, stderr);
+                                    // showMsg(`<b>执行 npm install 安装新增模块时输出如下</b>：
+                                    //     ${stdout}
+                                    //     ${stderr}
+                                    //     <b>如有问题，请自行在应用根目录安装如下模块</b>：
+                                    //     ${packages.join(', ')}`);
+                                    let content = `<b>如有问题，请自行在应用根目录安装新增的 npm 模块</b>：
+                                                    ${packages.join(', ')}
+                                                    <br/>
+                                                    <b>执行 npm install 安装新增模块时输出如下</b>：
+                                                    <br/>
+                                                    ${stdout}
+                                                    ${stderr}
+                                                    `;
+                                    // 确认信息后点击重启应用
+                                    done(progress, false, content);
                                 }, function(error) {
-                                    showMsg(`<b>执行 npm install 安装新增模块时出错</b>：
-                                        ${error}
-                                        <b>请自行在应用根目录安装如下模块</b>：
-                                        ${packages.join(', ')}`);
-                                    done();
+                                    console.log('error', error);
+                                    // showMsg(`<b>执行 npm install 安装新增模块时出错</b>：
+                                    //     ${error}
+                                    //     <b>请自行在应用根目录安装如下模块</b>：
+                                    //     ${packages.join(', ')}`);
+                                    let content = `<b>请自行在应用根目录安装新增的 npm 模块</b>：
+                                                    ${packages.join(', ')}
+                                                    <br/>
+                                                    <b>执行 npm install 安装新增模块时出错</b>：
+                                                    <br/>
+                                                    ${error}
+                                                    `;
+                                    // 确认信息后点击重启应用
+                                    done(progress, false, content);
                                 })
                             } else {
-                                done();
+                                console.log('无新增模块');
+                                // 自动重启应用
+                                done(progress, true);
                             }
                             
                         }
