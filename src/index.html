@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Splice</title>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="./css/photon.min.css">
+    <link rel="stylesheet" href="./node_modules/dragula/dist/dragula.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+    <!-- All of the Node.js APIs are available in this renderer process. -->
+    <!-- We are using Node.js <script>document.write(process.versions.node)</script>,
+    Chromium <script>document.write(process.versions.chrome)</script>,
+    and Electron <script>document.write(process.versions.electron)</script>. -->
+    <div class="window" id="app">
+        <!-- .toolbar-header sits at the top of your app -->
+        <header class="toolbar toolbar-header">
+            <h1 class="title">Splice</h1>
+        </header>
+        <!-- Your app's content goes inside .window-content -->
+        <div class="window-content">
+            <div class="pane-group">
+                <div class="pane pane-sm sidebar">
+                    <template v-for="(category, cIndex) in actions">
+                        <nav class="nav-group" :class="{'disabled': (!!currentCategory && (category.name !== currentCategory) && (category.name !== '通用') && (currentCategory !== '通用')) || isSolo}">
+                            <h5 class="nav-group-title" v-cloak>{{ category.name }}</h5>
+                            <template v-for="(action, aIndex) in category.list">
+                                <span class="item-wrap">
+                  <span class="nav-group-item" :class="{'disabled': action.disabled || (action.isSolo && (currentActions.length > 0))}" @click="addToCurrent(category, action, [cIndex, aIndex])" v-cloak>
+                    <span :class="'icon icon-'+action.icon"></span> {{ action.name }}
+                                </span>
+                                <span v-if="!!action.wiki" class="icon icon-help-circled wiki-link" title="使用说明" @click="openExternal(action.wiki)"></span>
+                                </span>
+                            </template>
+                        </nav>
+                    </template>
+                </div>
+                <!-- 操作编辑栏 -->
+                <div class="pane pane-sm">
+                    <ul class="al-list-group" id="draggable">
+                        <li class="al-list-group-header">
+                            当前执行操作
+                        </li>
+                        <template v-for="(actionWrap, index) in currentActions">
+                            <li class="al-list-group-item draggable-item" :data-idx="index" v-cloak>
+                                <span :class="'icon icon-'+actionWrap.action.icon"></span> {{ actionWrap.action.name }}
+                                <span class="icon icon-cancel icon-delete-action" @click="deleteAction(actionWrap, index)"></span>
+                                <form v-if="actionWrap.action.configs">
+                                    <template v-for="config in actionWrap.action.configs">
+                                        <component :is="config.type" :label="config.label" v-model="config.value" :placeholder="config.placeholder"></component>
+                                    </template>
+                                </form>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+                <div class="pane">
+                    <h1 class="title current-tips" v-cloak>操作 {{ currentCategory }} 文件</h1>
+                    <!-- todo:  拖拽排序-->
+                    <p class="current-actions">您要执行的操作是：
+                        <span v-for="(action, index) in currentActions" v-cloak>{{ action.action.name + ((currentActions.length !== (index+1))?" + ":"")}}</span>
+                    </p>
+                    <p class="desc">＊用法：拖拽文件到下面的线框中（或者直接点击选取文件），会自动在所选文件目录下生成处理后的文件，<b>未添加重命名操作的话处理后的文件默认会覆盖原文件</b>，支持一次处理多个文件。
+                    </p>
+                    <p class="desc">＊注意：除了通用功能外，其他操作一次只能处理一种文件类型。
+                    </p>
+                    <p class="desc">＊提示：图片操作支持格式：jpeg,jpg,png,gif,svg。
+                    </p>
+                    <div class="get-files-container">
+                        <div class="dragarea j-dragarea">
+                            <!-- <input type="file" name="files" multiple="true" webkitdirectory directory> -->
+                            拖拽文件到这里
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn btn-default get-files">
+                                <span class="icon icon-doc-text-inv">选择文件</span>
+                            </button>
+                            <button class="btn btn-default get-directories">
+                                <span class="icon icon-folder">选择文件夹</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="loading-modal" v-show="isLoading">
+            <span class="icon-close-loading" @click="closeLoading">
+                <i class="mark x"></i>
+                <i class="mark xx"></i>
+            </span>
+            <div class="loading-animation">
+                <div class="loading"></div>
+                <div id="loading-text" v-text="loadingMsg">加载中...</div>
+            </div>
+        </div>
+        <!-- 处理成功提示 -->
+        <transition name="notification-fade">
+            <div v-show="isDone" class="notification" style="top: 16px; z-index: 9; opacity: 1">
+                <div class="notification__group notification__notitle">
+                    <h2 class="notification__title" style="display: none;">提示</h2>
+                    <div class="notification__content">{{ message }}</div>
+                    <div class="notification__closeBtn icon-close"></div>
+                </div>
+            </div>
+        </transition>
+
+        <!-- 在线更新提示 -->
+        <transition name="notification-fade">
+            <div v-show="needUpdating" class="notification updating-notification" style="top: 16px; z-index: 9; opacity: 1">
+                <span class="icon-close-updating" @click="closeUpdating">
+                    <i class="mark x"></i>
+                    <i class="mark xx"></i>
+                </span>
+                <div class="notification__group notification__notitle">
+                    <div class="notification__content" v-cloak>当前版本：{{ updateInfo.current }}
+                        <br>可升级到：{{ updateInfo.latest }} ( <!-- <span class="link" @click="openExternal(updateInfo.url)">升级日志</span> --> <span id="showLogs">升级日志</span>)
+                    </div>
+                    <a href="#!" class="btn red" id="updateBtn">
+                        <loader v-show="updateLoading"></loader><span v-cloak>{{ updateBtnText }}</span>
+                    </a>
+                    <div class="notification__closeBtn icon-close"></div>
+                </div>
+            </div>
+        </transition>
+        <!-- 报错、成功信息提示 -->
+        <transition name="notification-fade">
+            <div v-show="showMsg" class="notification" style="top: 16px; z-index: 9; opacity: 1">
+                <div class="notification__group notification__notitle">
+                    <div class="notification__content" v-cloak v-html="msg"></div>
+                </div>
+            </div>
+        </transition>
+        <!-- 展示大量信息的对话框 -->
+        <div class="notification notification__dialog" :class="{'notification--active': showDialog}" v-cloak>
+          <h2 class="notification__title">{{ dialogTitle }}</h2>
+          <div class="notification__content" v-html="dialogContent"></div>
+          <span v-show="showDialogBtn" class="btn red" id="dialogBtn">{{ dialogBtn }}</span>
+          <span class="notification__close" @click="showDialog = false">&#x2715;</span>
+        </div>
+
+    </div>
+    <script type="text/javascript" src="./js/jquery-1.8.2.js"></script>
+    <script type="text/javascript" src="./js/vue.min.js"></script>
+    <script type="text/javascript" src="./node_modules/dragula/dist/dragula.min.js"></script>
+    <script type="text/javascript" src='./js/utils.js'></script>
+    
+
+    <script>
+    // You can also require other files to run in this process
+    // require('./dist/app.js')
+    </script>
+    <script type="text/javascript" src="./js/modules.js"></script>
+    <!-- <script type="text/javascript" src="./dist/app.js"></script> -->
+    <!-- 引入自动化处理相关函数 -->
+    <script type="text/javascript" src="./js/workflow.js"></script>
+    <script type="text/javascript" src="./updater.js"></script>
+    <script type="text/javascript" src="./js/index.js"></script>
+</body>
+
+</html>

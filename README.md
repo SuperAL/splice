@@ -38,7 +38,7 @@ GUI workflow for Front-End developers based on Electron
 ## 截图
 
 ### 界面：
-![WIN](./images/GUI.png)
+![WIN](./images/GUI-v1.1.0.png)
 ![MAC](./images/GUI-mac.jpg)
 
 ### 简单操作：
