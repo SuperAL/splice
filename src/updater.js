@@ -291,7 +291,7 @@ var updater = {
             }
 
             // 读取本地
-            var pathLocalPackage = path.join(__dirname, 'package.json');
+            var pathLocalPackage = path.join(__dirname, '../package.json');
             // 对比本地版本和线上版本
             var strJSONLocalPackage = fs.readFileSync(pathLocalPackage, 'utf8');
             // string to JSON
