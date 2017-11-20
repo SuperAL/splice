@@ -37,7 +37,7 @@ var updater = {
         success = success || function() {};
         error = error || function() {};
 
-        var url = 'https://raw.githubusercontent.com/SuperAL/splice/dev/' + filepath + '?r=' + Math.random();
+        var url = 'https://raw.githubusercontent.com/SuperAL/splice/master/' + filepath + '?r=' + Math.random();
 
         https.get(url, function(res) {
             console.log('res is', res);
