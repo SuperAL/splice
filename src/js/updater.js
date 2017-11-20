@@ -162,6 +162,7 @@ var updater = {
             },
             hide() {
                 app.loadingMsg = '处理中...';
+                app.manually = true; // 不触发 watch 里的其他代码
                 app.isLoading = false;
             }
         };
@@ -291,7 +292,8 @@ var updater = {
             }
 
             // 读取本地
-            var pathLocalPackage = path.join(__dirname, '../package.json');
+            var pathLocalPackage = path.join(__dirname, '../package.json'); // 路径：package.json相对于当前文件所在的文件夹
+
             // 对比本地版本和线上版本
             var strJSONLocalPackage = fs.readFileSync(pathLocalPackage, 'utf8');
             // string to JSON
@@ -361,7 +363,7 @@ var updater = {
                     // 如果只按照最新的b版本升级，就会出现问题
                     // 因此，需要遍历出本地版本和线上版本之间的所有文件内容
                     // 首先，package.json 是必须的
-                    var arrFile = ['package.json'];
+                    var arrFile = ['package.json']; // 路径：文件位置相对于项目根目录
                     var packages = [];
                     manifest.forEach(function(obj) {
                         if (obj.version && obj.version.version() > versionLocal.version()) {
@@ -463,7 +465,7 @@ var updater = {
                             });
                         } else {
                             // 资源全部获取完毕，更新中...                           
-                            self.copy(dirUpdate, __dirname);
+                            self.copy(dirUpdate, path.join(__dirname, '../')); // 路径：项目根目录相对于当前文件所在的文件夹
 
                             
 
