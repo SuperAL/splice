@@ -17,9 +17,42 @@
     "pack:win": "electron-packager ./ Splice --platform=win32 --arch=x64 --overwrite --out=../splice-dist/ --icon=icon/logo.ico --version 1.2.5",
     "pack:win32": "electron-packager ./ Splice --platform=win32 --arch=ia32 --overwrite --out=../splice-dist/ --icon=icon/logo.ico --version 1.2.5"
   },
+  "config": {
+    "forge": {
+      "make_targets": {
+        "win32": [
+          "squirrel"
+        ],
+        "darwin": [
+          "zip"
+        ],
+        "linux": [
+          "deb",
+          "rpm"
+        ]
+      },
+      "electronPackagerConfig": {
+        "packageManager": "npm"
+      },
+      "electronWinstallerConfig": {
+        "name": "splice"
+      },
+      "electronInstallerDebian": {},
+      "electronInstallerRedhat": {},
+      "github_repository": {
+        "owner": "",
+        "name": ""
+      },
+      "windowsStoreConfig": {
+        "packageName": "",
+        "name": "splice"
+      }
+    }
+  },
   "dependencies": {
     "autoprefixer": "^7.1.6",
     "dragula": "^3.7.2",
+    "electron-compile": "^6.4.2",
     "gulp": "~3.9.0",
     "gulp-clean-css": "^3.7.0",
     "gulp-cssnano": "^2.1.2",
@@ -45,6 +78,7 @@
   "devDependencies": {
     "electron": "^1.7.5",
     "electron-packager": "^8.7.2",
+    "electron-prebuilt-compile": "1.7.9",
     "electron-reload": "^1.2.1"
   },
   "browserslist": [
