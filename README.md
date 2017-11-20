@@ -52,6 +52,43 @@ GUI workflow for Front-End developers based on Electron
 
 [win](https://github.com/SuperAL/splice/releases/download/1.1.0/Splice-win32-x64.zip) | [mac](https://github.com/SuperAL/splice/releases/download/1.1.0/Splice-darwin-x64.zip)
 
+## 开发
+1. 拉取项目
+```bash
+git clone https://github.com/SuperAL/splice.git
+```
+2. 安装依赖
+```bash
+npm install 
+```
+3. 运行项目
+```bash
+npm run start
+```
+4. 打包项目
+```bash
+# win 64位
+npm run pack:win
+
+# win 32位
+npm run pack:win32
+
+# mac，需要使用 mac 电脑
+npm run pack:mac
+```
+
+第二种打包方式（使用了 [electron-forge](https://www.npmjs.com/package/electron-forge)）
+```bash
+# 全局安装 electron-forge
+npm install electron-forge -g
+
+# 打包你当前使用的平台的版本
+electron-forge package
+
+# 制作安装器（installer） 
+electron-forge make
+```
+
 ## 协议
 
 [GNU General Public License v3.0](LICENSE)

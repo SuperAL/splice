@@ -37,7 +37,7 @@ var updater = {
         success = success || function() {};
         error = error || function() {};
 
-        var url = 'https://raw.githubusercontent.com/SuperAL/splice/master/' + filepath + '?r=' + Math.random();
+        var url = 'https://raw.githubusercontent.com/SuperAL/splice/dev/' + filepath + '?r=' + Math.random();
 
         https.get(url, function(res) {
             console.log('res is', res);
@@ -348,11 +348,12 @@ var updater = {
                 var dirUpdate = path.join(__dirname, versionRemote);
                 
                 console.log('升级按钮点击事件');
+                var progress; 
                 // 点击升级按钮
                 $('#updateBtn').on('click', function(e) {
                     e.preventDefault();
                     console.log('updateBtn click');
-                    if (loading.isLoading() || progress.hasProgress())  return;
+                    if (loading.isLoading() || (progress && progress.hasProgress()))  return;
                     console.log('updateBtn working');
                     loading.start();
                     // 这里有一个稍稍复杂的逻辑处理，就是
@@ -386,7 +387,7 @@ var updater = {
                     console.log('length', length);
 
                     // 开始升级进度提示
-                    var progress = percentProgress.init(length);
+                    progress = percentProgress.init(length);
 
                     // 循环获取文件资源
                     var start = 0;
