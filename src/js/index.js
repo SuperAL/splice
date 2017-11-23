@@ -125,7 +125,29 @@ let defaultActions = [{
     },
     {
         name: 'CSS',
-        list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'css', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'css', disabled: false }, {
+        list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'css', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'css', disabled: false }, { name: '图片转 base64', funcName: 'base64', icon: 'css', disabled: false, 
+            configs: [
+                {
+                    type: 'custom-input',
+                    label: '正则筛选不处理的图片路径',
+                    key: 'exclude',
+                    value: '',
+                    placeholder: '逗号分隔多个, 例: logo,png'
+                },
+                {
+                    type: 'custom-input',
+                    label: '最大处理图片大小',
+                    key: 'maxImageSize',
+                    value: '',
+                    placeholder: '单位: bytes; 默认: 10000'
+                },
+                {
+                    type: 'custom-checkbox',
+                    label: '是否保存设置',
+                    key: 'isSaved',
+                    value: false
+                }
+            ] }, {
             name: '精灵图',
             funcName: 'spriter',
             icon: 'css',
@@ -359,7 +381,7 @@ let defaultActions = [{
 var app = new Vue({
     el: '#app',
     data: {
-        actions: storedActions ? objectMerge(defaultActions, storedActions) : defaultActions,
+        actions: storedActions ? objectMerge(defaultActions, storedActions) : deepClone(defaultActions),
         currentCategory: '',
         currentActions: [],
         isLoading: false,
