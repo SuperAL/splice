@@ -17,6 +17,8 @@ var prettify = require('gulp-jsbeautifier');
 
 // 通过 css 生成精灵图
 var spriter = require('gulp-sprite-generator2');
+// css 中 url 引入的图片转 base64
+var base64 = require('gulp-base64');
 
 // json 文件处理
 var jsonMinify = require('gulp-json-minify');

@@ -70,6 +70,24 @@ var compressCSS = (stream) => {
   }));
 }
 
+/**
+ * gulp-base64 - 图片转 base64
+ * @author Alexee
+ * @date   2017-11-23
+ * @param  {[type]}   stream [description]
+ * @param  {[String]}   exclude [正则筛选不处理的图片路径]
+ * @return {[String]}   maxImageSize [最大处理图片大小]
+ */
+ var base64CSS = (stream, {exclude, maxImageSize}) => {
+  console.log('exclude is', exclude, maxImageSize);
+  console.log('exclude is', exclude.split(/[,，]/).map(item => item ? new RegExp(item) : null));
+  return stream.pipe(base64({
+    exclude: exclude.split(/[,，]/).map(item => item ? new RegExp(item) : null),
+    maxImageSize: +maxImageSize ? +maxImageSize : 10000, // bytes 
+    debug: true
+  }));
+}
+
 var spriteCSS = (stream, {dest, pattern, imgName, cssName, imgPath, isImgMin, imgDest, isCssMin, cssDest, callback}) => {
   let reg = new RegExp(pattern);
   var spriteOutput;
@@ -383,6 +401,7 @@ const FUNCS = {
   // css
   'prefix': prefixCSS,
   'compress': compressCSS,
+  'base64': base64CSS,
   'spriter': spriteCSS,
   // js
   'uglify': uglifyJS,
@@ -403,6 +422,7 @@ const LOGS = {
   // css
   'prefix': '添加兼容性前缀',
   'compress': '压缩 css',
+  'base64': 'css 中图片转 base64',
   'spriter': '处理 css 生成精灵图',
   // js
   'uglify': '压缩 js',
