@@ -1,4 +1,10 @@
 var updater = {
+    // 重启应用
+    relaunch: function() {
+        remote.app.relaunch();
+        remote.app.exit(0);
+    },
+    // 右键菜单
     contextmenu: function () {
         var self = this;
         var menu = new Menu();
@@ -22,6 +28,10 @@ var updater = {
             click: () => {
                 self.updateDetect(self.app);
             }
+        }));
+        menu.append(new MenuItem({
+            label: '重启应用',
+            click: self.relaunch
         }));
 
         window.addEventListener('contextmenu', function (event) {
@@ -232,7 +242,7 @@ var updater = {
             }
         }
         document.getElementById('dialogBtn').addEventListener('click', function(e) {
-            location.reload();
+            self.relaunch();
         });
         var done = function(progress, autoload, content) {
             console.log('progress is', progress);
@@ -245,7 +255,7 @@ var updater = {
                     // 升级成功，重载中...
                     // 提示信息
                     btnTxt('升级成功，重载中...')
-                    location.reload();
+                    self.relaunch();
                 }, 3000);
             } else {
                 if (content) {app.dialogTitle = '模块安装提示';
@@ -253,9 +263,8 @@ var updater = {
                     app.showDialogBtn = true;
                     app.dialogBtn = '重启应用';
                     app.showDialog = true;
-                    
                 } else {
-                    location.reload();
+                    self.relaunch();
                 }
             }
         }
@@ -472,7 +481,7 @@ var updater = {
 
                             // 安装新增模块
                             if (packages.length > 0) {
-                                console.log('需要安装新模块');
+                                console.log('需要安装新模块：' + packages.join(','));
                                 self.install(packages, function(stdout, stderr) {
                                     console.log('stdout, stderr', stdout, stderr);
                                     // showMsg(`<b>执行 npm install 安装新增模块时输出如下</b>：
@@ -480,13 +489,14 @@ var updater = {
                                     //     ${stderr}
                                     //     <b>如有问题，请自行在应用根目录安装如下模块</b>：
                                     //     ${packages.join(', ')}`);
-                                    let content = `<b>如有问题，请自行在应用根目录安装新增的 npm 模块</b>：
-                                                    ${packages.join(', ')}
+                                    let content = `<b>如重启后使用有问题，请自行在应用根目录(.../resources/app/)安装新增的 npm 模块</b>：
+                                                    <span style="color: red;">${packages.join(', ')}</span>
+                                                    <br/>
                                                     <br/>
                                                     <b>执行 npm install 安装新增模块时输出如下</b>：
                                                     <br/>
-                                                    ${stdout}
-                                                    ${stderr}
+                                                    <pre>${stdout}
+                                                    ${stderr}</pre>
                                                     `;
                                     // 确认信息后点击重启应用
                                     done(progress, false, content);
@@ -496,12 +506,13 @@ var updater = {
                                     //     ${error}
                                     //     <b>请自行在应用根目录安装如下模块</b>：
                                     //     ${packages.join(', ')}`);
-                                    let content = `<b>请自行在应用根目录安装新增的 npm 模块</b>：
-                                                    ${packages.join(', ')}
+                                    let content = `<b>请自行在应用根目录(.../resources/app/)安装新增的 npm 模块</b>：
+                                                    <span style="color: red;">${packages.join(', ')}</span>
+                                                    <br/>
                                                     <br/>
                                                     <b>执行 npm install 安装新增模块时出错</b>：
                                                     <br/>
-                                                    ${error}
+                                                    <pre>${error}</pre>
                                                     `;
                                     // 确认信息后点击重启应用
                                     done(progress, false, content);
@@ -531,8 +542,12 @@ var updater = {
         success = success || function() {};
         fail = fail || function() {};
 
-        let cmd = `npm i -S ${packages.join(' ')}`;
-        exec(cmd, function(error, stdout, stderr) {
+        // __dirname 是项目运行时入口文件所在的文件夹
+        let folder = path.join(__dirname, '../');
+        let cmd = `npm i -S ${packages.join(' ')} --prefix ./`;
+        exec(cmd, {
+            cwd: folder
+        }, function(error, stdout, stderr) {
             if (error) {
                 console.error(`exec error: ${error}`);
                 fail(error);
