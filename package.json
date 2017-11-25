@@ -1,26 +1,38 @@
 {
   "name": "splice",
   "version": "1.1.2",
-  "manifest": [{
-    "version": "1.1.2",
-    "files": ["src/js/updater.js", "README.md", "src/css/style.css"],
-    "packages": [],
-    "logs": ["修复：发布版 npm 模块的下载位置有误", "新增：右键菜单-重启应用", "优化：应用升级后的重启功能", "优化：对话框输出信息的显示"]
-  }, {
-    "version": "1.1.1",
-    "files": [
-      "src/js/index.js",
-      "src/js/modules.js",
-      "src/js/workflow.js",
-      "src/main.js"
-    ],
-    "packages": [
-      "gulp-base64"
-    ],
-    "logs": [
-      "css 新增功能：图片转 base64"
-    ]
-  }],
+  "manifest": [
+    {
+      "version": "1.1.2",
+      "files": [
+        "src/js/updater.js",
+        "README.md",
+        "src/css/style.css"
+      ],
+      "packages": [],
+      "logs": [
+        "修复：发布版 npm 模块的下载位置有误",
+        "新增：右键菜单-重启应用",
+        "优化：应用升级后的重启功能",
+        "优化：对话框输出信息的显示"
+      ]
+    },
+    {
+      "version": "1.1.1",
+      "files": [
+        "src/js/index.js",
+        "src/js/modules.js",
+        "src/js/workflow.js",
+        "src/main.js"
+      ],
+      "packages": [
+        "gulp-base64"
+      ],
+      "logs": [
+        "css 新增功能：图片转 base64"
+      ]
+    }
+  ],
   "description": "GUI workflow for Front-End developers based on Electron",
   "main": "src/main.js",
   "repository": "https://github.com/SuperAL/splice.git",
