@@ -44,17 +44,17 @@ GUI workflow for Front-End developers based on Electron
 ## 截图
 
 ### 界面：
-![WIN](./images/GUI-v1.1.2.png)
-![MAC](./images/GUI-mac.jpg)
+!- [WIN](./images/GUI-v1.1.2.png)
+!- [MAC](./images/GUI-mac.jpg)
 
 ### 简单操作：
-![压缩并重命名图片](./images/splice-demo1.gif)
+!- [压缩并重命名图片](./images/splice-demo1.gif)
 
 ## 下载地址
 
-- [win zip](https://github.com/SuperAL/splice/releases/download/1.1.2/splice-win32-x64-v1.1.2.zip)（解压了找到 `splice.exe` 双击打开就能用）
-- [win installer](https://github.com/SuperAL/splice/releases/download/1.1.2/splice-1.1.2.Setup.exe)（双击该文件进行安装，与开箱即用版差别就是该安装器小了 5MB，(＃￣▽￣＃)）
-- [mac]()（还未打包最新版的，可以去 release 中找到 `1.0.0` 版本）
+- - [win zip](https://github.com/SuperAL/splice/releases/download/1.1.2/splice-win32-x64-v1.1.2.zip)（解压了找到 `splice.exe` 双击打开就能用）
+- - [win installer](https://github.com/SuperAL/splice/releases/download/1.1.2/splice-1.1.2.Setup.exe)（双击该文件进行安装，与开箱即用版差别就是该安装器小了 5MB，(＃￣▽￣＃)）
+- - [mac]()（还未打包最新版的，可以去 release 中找到 `1.0.0` 版本）
 
 ## 开发
 1. 拉取项目
@@ -81,7 +81,7 @@ npm run pack:win32
 npm run pack:mac
 ```
 
-第二种打包方式（使用了 [electron-forge](https://www.npmjs.com/package/electron-forge)）
+第二种打包方式（使用了 - [electron-forge](https://www.npmjs.com/package/electron-forge)）
 ```bash
 # 全局安装 electron-forge
 npm install electron-forge -g
@@ -93,8 +93,56 @@ electron-forge package
 electron-forge make
 ```
 
+## 使用到的 npm 模块
+
+#### 工具类
+- [gulp](https://www.npmjs.com/package/gulp)
+- [gulp-if](https://www.npmjs.com/package/gulp-if)
+
+#### html 压缩
+- [gulp-htmlmin](https://www.npmjs.com/package/gulp-htmlmin)
+
+#### 通过 html 文件处理 css、js 文件的合并
+- [gulp-usemin2](https://www.npmjs.com/package/gulp-usemin2)
+
+#### css 压缩、添加兼容前缀
+- [gulp-postcss](https://www.npmjs.com/package/gulp-postcss)
+- [gulp-cssnano](https://www.npmjs.com/package/gulp-cssnano)
+- [autoprefixer](https://www.npmjs.com/package/autoprefixer)
+
+#### 将 css 中通过 url 引入的图片转成 base64
+- [gulp-base64](https://www.npmjs.com/package/gulp-base64)
+
+#### 通过 css 生成精灵图
+- [gulp-sprite-generator2](https://www.npmjs.com/package/gulp-sprite-generator2)
+
+#### js 压缩
+- [gulp-uglify](https://www.npmjs.com/package/gulp-uglify)
+
+#### 图片压缩
+- [gulp-imagemin](https://www.npmjs.com/package/gulp-imagemin)
+- [imagemin-pngquant](https://www.npmjs.com/package/imagemin-pngquant)
+
+#### 精灵图处理
+- [gulp.spritesmith](https://www.npmjs.com/package/gulp.spritesmith)
+- [vinyl-buffer](https://www.npmjs.com/package/vinyl-buffer)
+- [merge-stream](https://www.npmjs.com/package/merge-stream)
+
+#### json 文件压缩
+- [gulp-json-minify](https://www.npmjs.com/package/gulp-json-minify)
+
+#### JavaScript, JSON, HTML 和 CSS 代码格式化
+- [gulp-jsbeautifier](https://www.npmjs.com/package/gulp-jsbeautifier)
+
+#### 文件重命名
+- [gulp-rename](https://www.npmjs.com/package/gulp-rename)
+
+#### 监听文件变化，显示 loading 效果
+- [gulp-watch](https://www.npmjs.com/package/gulp-watch)
+- [path-exists](https://www.npmjs.com/package/path-exists)
+
 ## 协议
 
-[GNU General Public License v3.0](LICENSE)  
+- [GNU General Public License v3.0](LICENSE)  
 本项目仅供学习交流和私人使用，禁止用作商业用途
 

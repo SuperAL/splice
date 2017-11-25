@@ -34,7 +34,7 @@ var merge = require('merge-stream');
 
 // usemin
 var usemin = require('gulp-usemin2');
-var cleanCSS = require('gulp-clean-css');
+// var cleanCSS = require('gulp-clean-css');
 
 // for loading
 var watch = require('gulp-watch');
