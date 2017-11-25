@@ -10,6 +10,7 @@ GUI workflow for Front-End developers based on Electron
 2. CSS：
 	- 添加兼容性前缀
 	- 压缩 css
+	- 图片转 base64
 	- 精灵图
 		- 处理 css 文件并生成相应的精灵图
 3. JS：
