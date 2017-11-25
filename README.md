@@ -93,7 +93,7 @@ electron-forge package
 electron-forge make
 ```
 
-## 使用到的 npm 模块
+## 使用到的文件操作相关模块
 
 #### 工具类
 - [gulp](https://www.npmjs.com/package/gulp)
@@ -143,6 +143,6 @@ electron-forge make
 
 ## 协议
 
-- [GNU General Public License v3.0](LICENSE)  
+[GNU General Public License v3.0](LICENSE)  
 本项目仅供学习交流和私人使用，禁止用作商业用途
 
