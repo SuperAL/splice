@@ -45,7 +45,7 @@ GUI workflow for Front-End developers based on Electron
 
 ### 界面：
 ![WIN](./images/GUI-v1.1.2.png)
-![MAC](./images/GUI-mac.jpg)
+![MAC](./images/GUI-mac-v1.1.2.jpg)
 
 ### 简单操作：
 ![压缩并重命名图片](./images/splice-demo1.gif)
@@ -54,7 +54,7 @@ GUI workflow for Front-End developers based on Electron
 
 - [win zip](https://github.com/SuperAL/splice/releases/download/1.1.2/splice-win32-x64-v1.1.2.zip)（解压了找到 `splice.exe` 双击打开就能用）
 - [win installer](https://github.com/SuperAL/splice/releases/download/1.1.2/splice-1.1.2.Setup.exe)（双击该文件进行安装，与开箱即用版差别就是该安装器小了 5MB，(＃￣▽￣＃)）
-- [mac]()（还未打包最新版的，可以去 release 中找到 `1.0.0` 版本）
+- [mac](https://github.com/SuperAL/splice/releases/download/1.1.2/Splice-darwin-x64.zip)
 
 ## 开发
 1. 拉取项目
