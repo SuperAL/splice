@@ -59,7 +59,8 @@ GUI workflow for Front-End developers based on Electron
 ## 开发
 1. 拉取项目
 ```bash
-git clone https://github.com/SuperAL/splice.git
+git clone https://github.com/SuperAL/splice.git --depth=1
+# 解释一下那个 `--depth=1`，代表只获取最新的 commit 记录。 因为之前的一些误操作，不小心将打包后的文件也上传到了 git，即使文件删掉了记录还是存在，因此记录文件超级大，直接导致 `clone` 超级慢。加上 `--depth=1` 可以解决 `clone` 慢的问题。
 ```
 2. 安装依赖
 ```bash
