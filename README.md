@@ -83,7 +83,7 @@ npm run pack:win32
 # mac，需要使用 mac 电脑
 npm run pack:mac
 ```
-
+ 
 第二种打包方式（使用了 - [electron-forge](https://www.npmjs.com/package/electron-forge)）
 ```bash
 # 全局安装 electron-forge
