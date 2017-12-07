@@ -1,5 +1,8 @@
+#  项目地址
+[Github](https://github.com/SuperAL/splice)
+
 # splice
-GUI workflow for Front-End developers based on Electron
+> GUI workflow for Front-End developers based on Electron
 
 ## 功能
 
@@ -29,8 +32,8 @@ GUI workflow for Front-End developers based on Electron
 
 ### 其他：
 - 快捷键：
-	- 刷新页面：Ctrl+Alt+R
-	- 开启或关闭开发者工具：Ctrl+Alt+T
+	- 刷新页面：`Ctrl+Alt+R`
+	- 开启或关闭开发者工具：`Ctrl+Alt+T`
 - 右键菜单：
 	- 刷新：刷新页面
 	- 开发者工具：开启或关闭开发者工具
@@ -44,11 +47,11 @@ GUI workflow for Front-End developers based on Electron
 ## 截图
 
 ### 界面：
-![WIN](./images/GUI-v1.1.2.png)
-![MAC](./images/GUI-mac-v1.1.2.jpg)
+![WIN](http://upload-images.jianshu.io/upload_images/448830-7ee0b68edacb73b3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![MAC](http://upload-images.jianshu.io/upload_images/448830-2d76fb76b8f08257.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 ### 简单操作：
-![压缩并重命名图片](./images/splice-demo1.gif)
+![压缩并重命名图片](http://upload-images.jianshu.io/upload_images/448830-f58f7b1d6340d8f2.gif?imageMogr2/auto-orient/strip)
 
 ## 下载地址
 
@@ -84,7 +87,7 @@ npm run pack:win32
 npm run pack:mac
 ```
  
-第二种打包方式（使用了 - [electron-forge](https://www.npmjs.com/package/electron-forge)）
+第二种打包方式（使用了 [electron-forge](https://www.npmjs.com/package/electron-forge)，该方式打包的 `exe` 版本比 `electron-packager` 大一点点）
 ```bash
 # 全局安装 electron-forge
 npm install electron-forge -g
@@ -148,4 +151,3 @@ electron-forge make
 
 [GNU General Public License v3.0](LICENSE)  
 本项目仅供学习交流和私人使用，禁止用作商业用途
-
