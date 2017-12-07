@@ -520,6 +520,11 @@ var app = new Vue({
             }
             console.log(`this.currentCategory: ${this.currentCategory}`);
         },
+        clearActions() {
+            while (this.currentActions.length > 0) {
+                this.deleteAction(this.currentActions[0], 0)
+            }
+        },
         getConfig() {
             console.table(this.currentActions[0].action.configs)
         },

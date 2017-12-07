@@ -75,26 +75,28 @@
 
 		 .draggable-item .icon-delete-action {
 		 	position: absolute;
-		 	top: 20px;
+		 	top: 18px;
 		 	right: 5px;
-		 	width: 15px;
-		 	height: 15px;
-		 	font-size: 15px;
-		 	line-height: 15px;
+		 	width: 20px;
+		 	height: 20px;
+		 	font-size: 20px;
+		 	line-height: 20px;
 		 	text-align: center;
-		 	color: #666;
-		 	opacity: 0;
-		 	transition: opacity .1s linear, background-color .1s linear;
+		 	color: #b8b6b8;
+		 	opacity: 1;
+		 	transition: color .1s linear, background-color .1s linear;
 		 	border-radius: 3px;
 		 	transform: translateY(-50%);
 		 	z-index: 10;
+		 	cursor: pointer;
 		 }
 
-		 .draggable-item:hover .icon-delete-action {
+		 /*.draggable-item:hover .icon-delete-action {
 		 	opacity: 1;
-		 }
+		 }*/
 
 		 .draggable-item .icon-delete-action:hover {
+		 	color: #666;
 		 	background-color: rgba(0, 0, 0, .08);
 		 }
 		 .icon-delete-action::before {
@@ -146,6 +148,15 @@
 
 		 .al-list-group-header {
 		 	padding: 10px
+		 }
+
+		 .clear-btn {
+		 	float: right;
+		 	cursor: pointer;
+		 }
+		 .clear-btn.disabled {
+		 	color: #d4d2d4; 
+		 	cursor: not-allowed;
 		 }
 
 		 .dragarea input {

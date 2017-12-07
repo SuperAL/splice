@@ -44,6 +44,7 @@
                     <ul class="al-list-group" id="draggable">
                         <li class="al-list-group-header">
                             当前执行操作
+                            <span class="clear-btn" :class="{disabled: currentActions.length === 0}" @click="clearActions">清空</span>
                         </li>
                         <template v-for="(actionWrap, index) in currentActions">
                             <li class="al-list-group-item draggable-item" :data-idx="index" v-cloak>
@@ -100,7 +101,7 @@
         </div>
         <!-- 处理成功提示 -->
         <transition name="notification-fade">
-            <div v-show="isDone" class="notification" style="top: 16px; z-index: 9; opacity: 1">
+            <div v-cloak v-show="isDone" class="notification" style="top: 16px; z-index: 9; opacity: 1">
                 <div class="notification__group notification__notitle">
                     <h2 class="notification__title" style="display: none;">提示</h2>
                     <div class="notification__content">{{ message }}</div>
@@ -111,13 +112,13 @@
 
         <!-- 在线更新提示 -->
         <transition name="notification-fade">
-            <div v-show="needUpdating" class="notification updating-notification" style="top: 16px; z-index: 9; opacity: 1">
+            <div v-cloak v-show="needUpdating" class="notification updating-notification" style="top: 16px; z-index: 9; opacity: 1">
                 <span class="icon-close-updating" @click="closeUpdating">
                     <i class="mark x"></i>
                     <i class="mark xx"></i>
                 </span>
                 <div class="notification__group notification__notitle">
-                    <div class="notification__content" v-cloak>当前版本：{{ updateInfo.current }}
+                    <div class="notification__content">当前版本：{{ updateInfo.current }}
                         <br>可升级到：{{ updateInfo.latest }} ( <!-- <span class="link" @click="openExternal(updateInfo.url)">升级日志</span> --> <span id="showLogs">升级日志</span>)
                     </div>
                     <a href="#!" class="btn red" id="updateBtn">
@@ -129,9 +130,9 @@
         </transition>
         <!-- 报错、成功信息提示 -->
         <transition name="notification-fade">
-            <div v-show="showMsg" class="notification" style="top: 16px; z-index: 9; opacity: 1">
+            <div v-cloak v-show="showMsg" class="notification" style="top: 16px; z-index: 9; opacity: 1">
                 <div class="notification__group notification__notitle">
-                    <div class="notification__content" v-cloak v-html="msg"></div>
+                    <div class="notification__content" v-html="msg"></div>
                 </div>
             </div>
         </transition>

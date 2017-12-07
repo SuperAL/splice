@@ -383,7 +383,7 @@ var updater = {
                                 }
                             });
                             // 需要安装的模块
-                            obj.packages.forEach(function(package) {
+                            obj.packages && obj.packages.forEach(function(package) {
                                 if (packages.indexOf(package) === -1) {
                                     packages.push(package);
                                 }

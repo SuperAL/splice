@@ -1,7 +1,21 @@
 {
   "name": "splice",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "manifest": [
+    {
+      "version": "1.1.3",
+      "files": [
+        "README.md",
+        "src/index.html",
+        "src/css/style.css",
+        "src/js/index.js",
+        "src/js/updater.js"
+      ],
+      "logs": [
+        "新增：当前执行操作-清空",
+        "优化：默认显示操作的删除按钮"
+      ]
+    },
     {
       "version": "1.1.2",
       "files": [
