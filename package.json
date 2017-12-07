@@ -11,6 +11,7 @@
         "src/js/index.js",
         "src/js/updater.js"
       ],
+      "packages": [],
       "logs": [
         "新增：当前执行操作-清空",
         "优化：默认显示操作的删除按钮"
