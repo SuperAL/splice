@@ -18,7 +18,7 @@
     <div class="window" id="app">
         <!-- .toolbar-header sits at the top of your app -->
         <!-- mac 下可以把下面的 header 注释掉，因为和 mac 本身的应用 header 重复了 -->
-        <header class="toolbar toolbar-header">
+        <header v-cloak v-if="showHeader" class="toolbar toolbar-header">
             <h1 class="title">Splice</h1>
         </header>
         <!-- Your app's content goes inside .window-content -->

@@ -381,6 +381,7 @@ let defaultActions = [{
 var app = new Vue({
     el: '#app',
     data: {
+        showHeader: /^win/.test(process.platform), 
         actions: storedActions ? objectMerge(defaultActions, storedActions) : deepClone(defaultActions),
         currentCategory: '',
         currentActions: [],
@@ -430,6 +431,7 @@ var app = new Vue({
     },
     mounted() {
         updater.init(this);
+        console.log(`This platform is ${process.platform}`);
     },
     watch: {
         isLoading(newVal) {
