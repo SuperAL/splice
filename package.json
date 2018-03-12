@@ -6,12 +6,16 @@
       "version": "1.1.4",
       "files": [
         "src/index.html",
-        "src/js/index.js"
+        "src/css/style.css",
+        "src/js/index.js",
+        "src/assets/handlebarsStr.css.handlebars",
+        "src/js/workflow.js"
       ],
       "packages": [],
       "logs": [
         "优化：mac 系统隐藏 header",
-        "其他：更新 electron 版本（开发使用）"
+        "其他：更新 electron 版本（开发使用）",
+        "新增：自定义 图片生成精灵图 时 css 的生成模板"
       ]
     },
     {

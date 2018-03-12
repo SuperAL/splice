@@ -24,11 +24,11 @@ var minifyHTML = (stream) => {
 var useminHTML = (stream, {isUglify, isRev}) => {
   return stream.pipe(usemin({
     // cssmin: cleanCSS(), // 使用 css 压缩会导致无法生成最终的 css 文件
-    jsmin: isUglify && uglify() , 
+    jsmin: isUglify && uglify() ,
     rev: isRev
 
     // 以下为 gulp-usemin 用法
-    // css: [ minifyCSS(), rev() ],    
+    // css: [ minifyCSS(), rev() ],
     // html: [ htmlmin({ collapseWhitespace: true }) ],
     // js: [ uglify(), rev() ],
     // inlinejs: [ uglify() ]
@@ -40,14 +40,14 @@ var useminHTML = (stream, {isUglify, isRev}) => {
 /**
  * -----------------------------------------------------------------
  * CSS 文件相关操作
- * ----------------------------------------------------------------- 
+ * -----------------------------------------------------------------
  */
 /**
  * gulp-postcss - 添加兼容性前缀
  * @author Alexee
  * @date   2017-07-21
- * @param  {gulp stream}   stream 
- * @return {gulp stream}   stream     
+ * @param  {gulp stream}   stream
+ * @return {gulp stream}   stream
  */
 var prefixCSS = (stream) => {
   return stream.pipe(postcss([autoprefixer()]));
@@ -57,7 +57,7 @@ var prefixCSS = (stream) => {
  * gulp-cssnano - 压缩 css 文件
  * @author Alexee
  * @date   2017-07-21
- * @param  {gulp stream}   stream 
+ * @param  {gulp stream}   stream
  * @return {gulp stream}   stream
  */
 var compressCSS = (stream) => {
@@ -83,7 +83,7 @@ var compressCSS = (stream) => {
   console.log('exclude is', exclude.split(/[,，]/).map(item => item ? new RegExp(item) : null));
   return stream.pipe(base64({
     exclude: exclude.split(/[,，]/).map(item => item ? new RegExp(item) : null),
-    maxImageSize: +maxImageSize ? +maxImageSize : 10000, // bytes 
+    maxImageSize: +maxImageSize ? +maxImageSize : 10000, // bytes
     debug: true
   }));
 }
@@ -182,7 +182,7 @@ var spriteCSS = (stream, {dest, pattern, imgName, cssName, imgPath, isImgMin, im
  * gulp-uglify - 压缩 js 文件
  * @author Alexee
  * @date   2017-07-22
- * @param  {gulp stream}   stream 
+ * @param  {gulp stream}   stream
  * @return {gulp stream}   stream
  */
 var uglifyJS = (stream) => {
@@ -224,11 +224,29 @@ var imageminIMG = (stream) => {
  * @param  {gulp stream}   stream
  * @return {gulp stream}   stream
  */
-var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, isCssMin, cssDest, callback}) => {
+var spriteIMG = (stream, {dest, imgName, cssName, imgPath, cssTemplate, cssTemplateEdit, isImgMin, imgDest, isCssMin, isSaved, cssDest, callback}) => {
+  let cssTemplateDir = 'src/assets/';
+  let cssTemplateFile = 'handlebarsStr.css.handlebars';
+  let cssTemplateFileTemp = 'handlebarsStrTemp.css.handlebars';
+  let cssTemplatePath = `${cssTemplateDir}${isSaved ? cssTemplateFile : cssTemplateFileTemp}`;
+
+  // 先处理 cssTemplate 的写入
+  if (cssTemplateEdit) {
+    // 先确定文件夹存在
+    if (!fs.existsSync(cssTemplateDir)) {
+      // 不存在的话创建文件夹
+      fs.mkdirSync(cssTemplateDir);
+    }
+    // 然后写入数据
+    fs.writeFileSync(cssTemplatePath, cssTemplate);
+  }
+
   // Generate our spritesheet
   var spriteData = stream.pipe(spritesmith({
     imgName: imgName,
     cssName: cssName,
+    // 模板 path 相对于项目根目录
+    cssTemplate: cssTemplateEdit ? cssTemplatePath : null,
     imgPath: imgPath,
     padding: 4
   }));
@@ -265,7 +283,7 @@ var spriteIMG = (stream, {dest, imgName, cssName, imgPath, isImgMin, imgDest, is
   let watchFilepathCss = path.resolve(cssFinal, '*.*');
   let isImgFin = !pathExists.sync(imgFinal), isCssFin = !pathExists.sync(cssFinal);
 
-  // let a = pathExists.sync(imgFinal);  
+  // let a = pathExists.sync(imgFinal);
   // let b = pathExists.sync(cssFinal);
 
   // console.log('imgFinal pathExists', a);
@@ -331,7 +349,7 @@ var minifyJSON = (stream) => {
  * gulp-rename - 重命名
  * @author Alexee
  * @date   2017-07-26
- * @param  {gulp stream}   stream           
+ * @param  {gulp stream}   stream
  * @param  {[type]}   options.basename [文件名]
  * @param  {[type]}   options.prefix   [前缀]
  * @param  {[type]}   options.suffix   [后缀]
@@ -457,7 +475,7 @@ var handleIMG = (actionsName, src, dist, configs, callback) => {
     if (element.indexOf('sprite') !== -1) {
       // 精灵图处理函数中单独对 css 和 img 进行了导出操作
       configs.callback = callback;
-    } 
+    }
     stream = FUNCS[element](stream, configs);
   })
   // 精灵图操作 stream 返回 false
@@ -470,7 +488,7 @@ var handleIMG = (actionsName, src, dist, configs, callback) => {
       watcher.close();
       console.log('watching');
     });
-  } 
+  }
 }
 
 

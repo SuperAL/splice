@@ -155,7 +155,7 @@
 		 	cursor: pointer;
 		 }
 		 .clear-btn.disabled {
-		 	color: #d4d2d4; 
+		 	color: #d4d2d4;
 		 	cursor: not-allowed;
 		 }
 
@@ -256,7 +256,7 @@
 		 .loading-log {
 		 	color: #666;
 		 }
-			
+
 		 .mark {
 		 	background-color: #999;
 		 	position: absolute;
@@ -291,7 +291,7 @@
 		 #loading-modal .icon-close-loading:hover .mark {
 			background-color: #000;
 		 }
-		 
+
 
 
 
@@ -303,6 +303,10 @@
 		 }
 		 .pane p
 		 {text-indent: 20px;}
+		 .pane-md {
+		 	max-width:380px;
+		 	min-width:240px
+		 }
 		 /*左侧list*/
 		 .nav-group-title
 		 {
@@ -364,6 +368,10 @@
 		 /*操作title*/
 		 .current-tips
 		 {margin: 25px 0 !important;}
+
+		 textarea {
+		 	white-space: pre-wrap;
+		 }
 
 
 /*notification 信息提示*/
@@ -445,7 +453,7 @@
 	color: #97a8be
 }
 
-/*notification transition 动画*/ 
+/*notification transition 动画*/
 .notification-fade-enter-active, .notification-fade-leave-active {
 	transition: all .3s ease;
 }

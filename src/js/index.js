@@ -28,6 +28,24 @@ var customInput = {
         }
     }
 }
+
+var customTextarea = {
+    model: {
+        prop: 'userValue',
+        event: 'change'
+    },
+    props: ['label', 'userValue', 'placeholder'],
+    template: `<div class="form-group">
+    <label>{{label}}</label>
+    <textarea class="form-control" rows="8" :placeholder="placeholder" @input="updateValue($event.target.value)">{{ userValue }}</textarea>
+    </div>`,
+    methods: {
+        updateValue(newVal) {
+            this.$emit('change', newVal)
+        }
+    }
+}
+
 var customRadio = {
     model: {
         prop: 'userValue',
@@ -125,7 +143,7 @@ let defaultActions = [{
     },
     {
         name: 'CSS',
-        list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'css', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'css', disabled: false }, { name: '图片转 base64', funcName: 'base64', icon: 'css', disabled: false, 
+        list: [{ name: '添加兼容性前缀', funcName: 'prefix', icon: 'css', disabled: false }, { name: '压缩', funcName: 'compress', icon: 'css', disabled: false }, { name: '图片转 base64', funcName: 'base64', icon: 'css', disabled: false,
             configs: [
                 {
                     type: 'custom-input',
@@ -175,7 +193,7 @@ let defaultActions = [{
                 },
                 {
                     type: 'custom-input',
-                    label: '生成的css中图片相对地址',
+                    label: 'css中图片相对地址',
                     key: 'imgPath',
                     value: '../image'
                 },
@@ -237,9 +255,28 @@ let defaultActions = [{
                     },
                     {
                         type: 'custom-input',
-                        label: '生成的css中引用的图片地址',
+                        label: 'css中引用的图片地址',
                         key: 'imgPath',
                         value: 'sprite.png'
+                    },
+                    {
+                        type: 'custom-textarea',
+                        label: 'css生成模板',
+                        key: 'cssTemplate',
+                        value: `{{#sprites}}
+.icon-{{name}} {
+    background-image: url({{{escaped_image}}});
+    background-position: {{px.offset_x}} {{px.offset_y}};
+    width: {{px.width}};
+    height: {{px.height}};
+}
+{{/sprites}}`
+                    },
+                    {
+                        type: 'custom-checkbox',
+                        label: '是否使用上方修改后的css模板',
+                        key: 'cssTemplateEdit',
+                        value: false
                     },
                     {
                         type: 'custom-input',
@@ -381,7 +418,7 @@ let defaultActions = [{
 var app = new Vue({
     el: '#app',
     data: {
-        showHeader: /^win/.test(process.platform), 
+        showHeader: /^win/.test(process.platform),
         actions: storedActions ? objectMerge(defaultActions, storedActions) : deepClone(defaultActions),
         currentCategory: '',
         currentActions: [],
@@ -425,6 +462,7 @@ var app = new Vue({
     },
     components: {
         customInput,
+        customTextarea,
         customRadio,
         customCheckbox,
         loader
@@ -631,7 +669,7 @@ $(document).ready(function() {
             handleFiles(filePaths);
         })
     })
-    // 选择文件夹 
+    // 选择文件夹
     $('.get-directories')[0].addEventListener('click', function(e) {
         dialog.showOpenDialog({ properties: ['openDirectory', 'multiSelections'] }, (filePaths) => {
             console.log(filePaths);
@@ -753,7 +791,7 @@ var handleFiles = (filePaths) => {
         walk(filepath, function(err, results) {
             // results:
             // F:\Projects - relative\slice-workflow - relative\样式优化\style.css
-            
+
             // 克隆配置信息，针对单个文件进行配置信息的再处理
             let singleConfig = deepClone(configs);
 
@@ -797,7 +835,7 @@ var handleFiles = (filePaths) => {
     if (isTotal) {
         // 判断是否设置了 导出目录，默认导出到当前目录，保存在 configs 变量里是为了让 spriteIMG 操作可以获取到
         configs.dest = !!configs.dest ? path.resolve(multiFileDir, configs.dest) : multiFileDir;
-        
+
         // 判断是否存在需要处理的文件
         if (multiSrc.length === 0) {
             alert(`没有需要处理的文件～`);
@@ -849,7 +887,7 @@ var handleFileType = (fileType) => {
         let currentTypes = typeOptions['format'].concat(app.file_types);
         // 只要处理的文件有格式不对的，都会提示
         if (currentTypes.indexOf(fileType.toLowerCase()) == -1) {
-            app.message = `格式化操作支持文件后缀： 
+            app.message = `格式化操作支持文件后缀：
                         ${currentTypes.join(' / ')}`;
             if (app.isDone) {
                 clearTimeout(app.clear);
