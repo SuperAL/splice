@@ -1,5 +1,5 @@
 #  项目地址
-[Github 仓库本体（发布版，下载地址在这里的 release 里）](https://github.com/SuperAL/splice)    
+[Github 仓库本体（发布版，下载地址在这里的 release 里）](https://github.com/SuperAL/splice)
 [Github 仓库分身（开发版，clone 或 fork 这个）](https://github.com/SuperAL/splice-dev)
 
 # splice
@@ -44,6 +44,7 @@
   - 打开应用后默认检查更新，右键菜单也可以点击检查更新
   - 当 github 上存在更新的版本时，显示 **一键升级** 按钮
   - 更新思路：替换文件，自动安装新增的 npm 模块（可能安装失败，可以到应用根目录 `...resources/app/` 手动安装）
+  - 要是更新后出了问题，操作项的表单有点奇怪（有重复的表单元素之类的 ），就打开开发者工具，选择 Application 标签，找到 Local Storage，然后删掉缓存的数据，再右键刷新下 Splice 应用，应该就能恢复正常了（老天保佑！）
 
 ## 截图
 
