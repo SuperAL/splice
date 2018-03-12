@@ -1,5 +1,6 @@
 #  项目地址
-[Github](https://github.com/SuperAL/splice)
+[Github 仓库本体（发布版，下载地址在这里的 release 里）](https://github.com/SuperAL/splice)    
+[Github 仓库分身（开发版，clone 或 fork 这个）](https://github.com/SuperAL/splice-dev)
 
 # splice
 > GUI workflow for Front-End developers based on Electron
@@ -8,7 +9,7 @@
 
 ### 实现前端常用的文件处理功能：
 1. HTML：
-	- 压缩 html 
+	- 压缩 html
 	- 通过 html 中的注释来合并 css / js
 2. CSS：
 	- 添加兼容性前缀
@@ -62,14 +63,18 @@
 ## 开发
 1. 拉取项目
 ```bash
+git clone https://github.com/SuperAL/splice-dev.git
+```
+下面是针对 splice 仓库的 clone 操作，现在用上面的方法即可
+```bash
 git clone https://github.com/SuperAL/splice.git --depth=1
-# 解释一下那个 `--depth=1`，代表只获取最新的 commit 记录。 
+# 解释一下那个 `--depth=1`，代表只获取最新的 commit 记录。
 # 因为之前的一些误操作，不小心将打包后的文件也上传到了 git，即使文件删掉了记录还是存在，因此记录文件超级大，直接导致 `clone` 超级慢。
 # 加上 `--depth=1` 可以解决 `clone` 慢的问题。
 ```
 2. 安装依赖
 ```bash
-npm install 
+npm install
 ```
 3. 运行项目
 ```bash
@@ -86,7 +91,7 @@ npm run pack:win32
 # mac，需要使用 mac 电脑
 npm run pack:mac
 ```
- 
+
 第二种打包方式（使用了 [electron-forge](https://www.npmjs.com/package/electron-forge)，该方式打包的 `exe` 版本比 `electron-packager` 大一点点）
 ```bash
 # 全局安装 electron-forge
@@ -95,7 +100,7 @@ npm install electron-forge -g
 # 打包你当前使用的平台的版本
 electron-forge package
 
-# 制作安装器（installer） 
+# 制作安装器（installer）
 electron-forge make
 ```
 
@@ -149,5 +154,5 @@ electron-forge make
 
 ## 协议
 
-[GNU General Public License v3.0](LICENSE)  
+[GNU General Public License v3.0](LICENSE)
 本项目仅供学习交流和私人使用，禁止用作商业用途
