@@ -225,7 +225,9 @@ var imageminIMG = (stream) => {
  * @return {gulp stream}   stream
  */
 var spriteIMG = (stream, {dest, imgName, cssName, imgPath, cssTemplate, cssTemplateEdit, isImgMin, imgDest, isCssMin, isSaved, cssDest, callback}) => {
-  let cssTemplateDir = 'src/assets/';
+  // __dirname 是项目运行时入口文件所在的文件夹
+  let cssTemplateDir = path.join(__dirname, './assets/');
+  console.log('cssTemplateDir is', cssTemplateDir);
   let cssTemplateFile = 'handlebarsStr.css.handlebars';
   let cssTemplateFileTemp = 'handlebarsStrTemp.css.handlebars';
   let cssTemplatePath = `${cssTemplateDir}${isSaved ? cssTemplateFile : cssTemplateFileTemp}`;
