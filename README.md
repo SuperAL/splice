@@ -157,3 +157,6 @@ electron-forge make
 
 [GNU General Public License v3.0](LICENSE)
 本项目仅供学习交流和私人使用，禁止用作商业用途
+
+## Final Words
+Inspiration comes from [sprite-it](https://github.com/HelKyle/sprite-it), Big thanks to [HelKyle](https://github.com/HelKyle). 
